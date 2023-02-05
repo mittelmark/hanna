@@ -21,7 +21,7 @@ for (file in args) {
             next
         } 
         if (flag) {
-            line = sub("^#' ","",line)
+            line = sub("^#' ?","",line)
             cat(line,"\n",file=fout)
         }
     }
