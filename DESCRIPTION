@@ -7,6 +7,7 @@ Author: Detlef Groth, University of Potsdam, Germany
 Maintainer: Detlef Groth <dgroth@uni-potsdam.de>
 Description: R code for the paper.
 Suggests: knitr, rmarkdown
+Depends: MASS
 VignetteBuilder: knitr
 License: MIT + file LICENSE
 NeedsCompilation: no

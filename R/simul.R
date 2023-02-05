@@ -210,7 +210,7 @@ simul_graph <- function (x,mode="draw") {
 #'   This function plots an adjacency matrix representing an undirected or
 #'   directed graph using different layout mechanisms.
 #' }
-#' \usage{simulplot(x,layout='sam',
+#' \usage{simul_plot(x,layout='sam',
 #'          vertex.size=1,vertex.labels=NULL,vertex.color="grey80",vertex.cex=1,vertex.pch=19,
 #'          edge.color="grey40",edge.lty=1,edge.text=NULL,edge.cex=1,edge.pch=0,
 #'          edge.lwd=3,weighted=FALSE,
@@ -230,9 +230,18 @@ simul_graph <- function (x,mode="draw") {
 #'   \item{edge.cex}{optional character expansion for the edge label and the underlying plotting character, default: 1}
 #'   \item{edge.pch}{optional character code for the edge.text, default: 0}
 #'   \item{edge.lwd}{the line width for the edges}
+#'   \item{weighted}{should the edges be shown with different weights given within the adjacency matrix}
 #'   \item{star.center}{for layout 'star' the central node, default: NULL}
 #'   \item{\ldots}{arguments delegated to the plot function}
 #' }
+#' \examples{
+#' res=simul_season(LETTERS[1:8])
+#' U = simul_graph(res$M,mode='draw')
+#' simul_plot(U)
+#' D = simul_graph(res$M,mode='win')
+#' simul_plot(D)
+#' }
+#'
 
 simul_plot = function (x,layout='sam',
                        vertex.size=1,vertex.labels=NULL,vertex.color="grey80",vertex.cex=1,vertex.pch=19,
@@ -254,7 +263,7 @@ simul_plot = function (x,layout='sam',
         rownames(layout)=vertex.labels
     }
     if (length(vertex.color) == 1) {
-        vertex.color=rep(vertex.color,nrow(g))
+        vertex.color=rep(vertex.color,nrow(x))
     }
     arrow <- function (x,y,cut=0.6,lwd=2,lty=1,arrow.col="#666666",...) {
         hx <- (1 - cut) * x[1] + cut * x[2]
@@ -323,4 +332,285 @@ simul_plot = function (x,layout='sam',
     points(layout,pch=vertex.pch,cex=6*vertex.size+0.4,col="black")
     points(layout,pch=vertex.pch,cex=6*vertex.size,col=vertex.color)
     text(layout,rownames(A),cex=vertex.cex)
+}
+
+#' \name{simul_layout}
+#' \alias{simul_layout}
+#' \title{ calculate a plot layout for an adjacency matrix }
+#' \description{
+#'   This function is used to create a layout for a given graph, there are 
+#'   a few algorithms available such as MDS based ones like 'mds' or 'sam'
+#'   and circular layouts like 'circle' or 'star', furthermore there is 
+#'   the possibility to use an interactive mode where the user clicks 
+#'   first on a node and then on the space where the node should be moved. 
+#'   This interactive mode can be finished by a right click.
+#' }
+#' \usage{ simul_layout(x,mode='sam', noise=FALSE, star.center=NULL, interactive=FALSE) }
+#' \arguments{
+#'   \item{x}{an adjacency matrix or an adjacency list}
+#'   \item{mode}{either 'mds','sam', 'circle', 'star', default: 'sam'}
+#'   \item{noise}{should some scatter been added to the given coordinates, default: FALSE}
+#'   \item{star.center}{the node which should be used as center of the star, if not given the first node in the graph will be in the center, default: NULL}
+#'   \item{interactive}{should be there an interactive clicking to mode the nodes in the layout, default: FALSE}
+#' }
+#' \examples{
+#' res=simul_season(LETTERS[1:8])
+#' U = simul_graph(res$M,mode='draw')
+#' lay=simul_layout(U)
+#' plot(lay, pch=19,col="salmon",cex=5,xlab="",ylab="",axes=FALSE)
+#' text(lay,rownames(U))
+#' }
+#'
+
+simul_layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interactive=FALSE) {
+    A=x
+    if (!identical(A,t(A))) {
+        A=D2u(A)
+    }
+    if (ncol(A)==3 & mode %in% c("sam","mds")) {
+        mode="circle"
+    }
+    if (mode %in% c('mds','sam')) {
+        A=Connect(A)
+        sp=Shortest.paths(A)
+        xy=cmdscale(sp)
+        rownames(xy)=rownames(A)
+        if (mode=='mds') {
+            dxy=base::as.matrix(dist(xy))
+            diag(dxy)=1
+            idx=which(dxy<0.05,arr.ind=TRUE)
+            if (nrow(idx)>1) {
+                for (i in 1:nrow(idx)) {
+                    n=idx[i,1]
+                    xy[n,1]=xy[n,1]+rnorm(1,mean=0,sd=0.1)
+                    xy[n,2]=xy[n,2]+rnorm(1,mean=0,sd=0.1)
+                }
+            }
+        } else {
+            xy=xy+jitter(xy)
+            xy=sammon(sp,y=xy,trace=FALSE)$points
+        }
+    } else if (mode %in% c('circle','star')) {
+        x=0
+        y=0
+        a=0.5
+        b=0.5
+        rad2deg <- function(rad) {(rad * 180) / (pi)}
+        deg2rad <- function(deg) {(deg * pi) / (180)}
+        xy=matrix(0,ncol=2,nrow=length(rownames(A)))
+        if (mode == "circle") {
+            nodes=rownames(A)
+            rownames(xy)=nodes
+            for (i in 1:length(nodes)) {
+                t=deg2rad((360/length(nodes))*(i-1))
+                xp = a*cos(t)*0.75 + x;
+                yp = b*sin(t)*0.75 + y;
+                xy[nodes[i],]=c(xp,yp)
+            }
+        } else if (mode == 'star') {
+            oorder=rownames(A)
+            if (class(star.center)[1] != "NULL") {
+                norder=c(which(rownames(A)==star.center),which(rownames(A)!=star.center))
+                A=A[norder,norder]
+            }
+            nodes=rownames(A)
+            rownames(xy)=nodes
+            xy[1,]=c(0.0,0.0)
+            for (i in 2:length(nodes)) {
+                t=deg2rad((360/(length(nodes)-1))*(i-2))
+                xp = a*cos(t)*0.75 + x;
+                yp = b*sin(t)*0.75 + y;
+                xy[nodes[i],]=c(xp,yp)
+            }
+            xy=xy[oorder,]
+        }
+    } else if (mode == 'grid') {
+        n=nrow(A)
+        xy=matrix(0,ncol=2,nrow=nrow(A))
+        rownames(xy)=rownames(A)
+        mody=ceiling(sqrt(n))
+        x=0
+        y=0
+        for (r in rownames(A)) {
+            if (x %% mody == 0) {
+                y=y+1
+                x=0
+            }
+            x=x+1
+            xy[r,]=c(x,y)
+        }
+    } else {
+        stop("unknown layout. Use mds, sam, circle, or grid as layout")
+    }
+    xy=scale(xy)
+    if (noise) {
+        xy=xy+rnorm(length(xy),mean=0,sd=0.1)
+    }
+    colnames(xy)=c("x","y")
+    doPlot <- function (A,xy) {
+        plot(xy,type="n",axes=FALSE,xlab="",ylab="")
+        for (i in 1:(ncol(A)-1)) {
+            for (j in i:ncol(A)) {
+                if (A[i,j]!=0 | A[j,i]!=0) {
+                    lines(x=lay[c(i,j),1],y=lay[c(i,j),2])
+                }
+            }
+        }
+        points(lay,pch=19,cex=6,col="grey90")
+        text(lay,rownames(lay))
+        return(lay)
+    }
+    if (interactive) {
+        lay=xy
+        lay=doPlot(A,lay)
+        print("click two times, first on the point to move, second where to move\nEnd with one or two right clicks!")
+        while (TRUE) {
+            loc=locator(2)
+            if (class(loc) == "NULL" | class(loc$x[2]) == "NULL" | class(loc$x[1]) == "NULL") {
+                break
+            }
+            dlay=rbind(lay,c(loc$x[1],loc$y[1]))
+            d=as.matrix(dist(dlay))[nrow(dlay),1:(nrow(dlay)-1)]
+            nm=names(which(d==min(d)))[1]
+            lay[nm,1]=loc$x[2]
+            lay[nm,2]=loc$y[2]
+            lay=doPlot(A,lay)
+        }
+        xy=lay
+    }
+    return(xy)
+}
+
+#' \name{simul_colors}
+#' \alias{simul_colors}
+#' \title{ create a color vector based on node degrees }
+#' \description{
+#'   This function creates three colors based on the in- and out-degrees of
+#'   for the nodes of the given adjacency matrix. nodes with only incoming nodes degrees get the first color,
+#'   nodes with in and out going edges ge the second color and nodes with
+#'   only outgoing edges the third color.
+#' }
+#' \usage{ simul_colors(x,col=c('grey80','salmon','red')) }
+#' \arguments{
+#'   \item{x}{ adjacency matrix }
+#'   \item{col}{color vector with three colors, default: c('grey80','salmon','red')}
+#' }
+#' \value{ vector of colors with length of node numner }
+#' \examples{
+#' res=simul_season(LETTERS[1:8])
+#' D = simul_graph(res$M,mode='win')
+#' cols=simul_colors(D)
+#' simul_plot(D,vertex.color=cols)
+#' }
+#' \seealso{ \code{\link{testprint}} }
+#'
+
+simul_colors <- function (x,col=c('grey80','salmon','red')) {
+    out=apply(x,1,sum)
+    ins=apply(x,2,sum)
+    cols=rep(col[1],ncol(x))
+    cols[out>0 & ins > 0]=cols[2]
+    cols[out>0 & ins == 0]=cols[3]
+    return(cols)
+}
+# private functions
+
+D2u <- function (g) {
+    g[lower.tri(g)]=g[lower.tri(g)]+t(g)[lower.tri(g)]
+    g[upper.tri(g)]=g[upper.tri(g)]+t(g)[upper.tri(g)]    
+    g[g>0]=1
+    g[g<0]=-1
+    return(g)
+}
+
+
+
+Connect = function (g) {
+    A=g
+    A=as.matrix(A)
+    A=A+t(A)
+    A[A>0]=1
+    P=Shortest.paths(A)
+    if (!any(P==Inf)) {
+        return(A)
+    }
+    comp=Components(A)
+    nodes=c()
+    tab=table(comp)
+    for (n in names(tab)) {
+        c=names(which(comp==n))
+        if (tab[[n]] > 2) {
+            Am=A[c,c]
+            # todo min
+            deg=apply(Am,1,sum)
+            idx=which(deg>0)
+            minval=min(deg[idx])
+            idx=which(deg == minval)[1]
+            node=c[idx]
+        } else {
+            node = c[1]
+        }
+        nodes=c(nodes,node)
+    }
+    A[nodes,nodes]=1
+    diag(A)=0
+    return(A)
+}
+
+Components <- function (g) {
+    A=g
+    A=as.matrix(A)
+    A=A+t(A)
+    A[A>0]=1
+    comp=c()
+    P=Shortest.paths(A)
+    nodes=rownames(A)
+    x=1
+    while (length(nodes) > 0) {
+        n=nodes[1]
+        idx=which(P[n,] < Inf)
+        ncomp=rep(x,length(idx))
+        names(ncomp)=rownames(P)[idx]
+        comp=c(comp,ncomp)
+        nodes=setdiff(nodes,rownames(P)[idx])
+        x=x+1
+    }
+    return(comp[rownames(A)])
+}
+
+Shortest.paths <- function (g,mode="directed") {
+    A=g
+    if (mode == "undirected") {
+        A=A+t(A)
+        A[A!=0]=1
+    }
+    S=A
+    S[]=Inf
+    diag(S)=0
+    x=1
+    S[A > 0 & A < Inf]=1
+    while (TRUE) { 
+        flag = FALSE 
+        for (m in 1:nrow(S)) {
+            ns=which(S[m,] == x)
+            for (n in ns) {
+                for (o in which(A[n,]==1)) {
+                    if (o != m) {
+                        flag = TRUE
+                        if (S[m,o] > x + 1) {
+                            S[m,o]=x+1
+                            if (mode == "undirected") {
+                                S[o,m]=x+1
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (!flag) {
+            break
+        }
+        x=x+1
+    }
+    return(S)
 }

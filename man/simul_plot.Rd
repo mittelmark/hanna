@@ -5,7 +5,7 @@
   This function plots an adjacency matrix representing an undirected or 
   directed graph using different layout mechanisms. 
 } 
-\usage{simulplot(x,layout='sam', 
+\usage{simul_plot(x,layout='sam', 
          vertex.size=1,vertex.labels=NULL,vertex.color="grey80",vertex.cex=1,vertex.pch=19, 
          edge.color="grey40",edge.lty=1,edge.text=NULL,edge.cex=1,edge.pch=0, 
          edge.lwd=3,weighted=FALSE, 
@@ -25,6 +25,15 @@
   \item{edge.cex}{optional character expansion for the edge label and the underlying plotting character, default: 1} 
   \item{edge.pch}{optional character code for the edge.text, default: 0} 
   \item{edge.lwd}{the line width for the edges} 
+  \item{weighted}{should the edges be shown with different weights given within the adjacency matrix} 
   \item{star.center}{for layout 'star' the central node, default: NULL} 
   \item{\ldots}{arguments delegated to the plot function} 
 } 
+\examples{ 
+res=simul_season(LETTERS[1:8]) 
+U = simul_graph(res$M,mode='draw') 
+simul_plot(U) 
+D = simul_graph(res$M,mode='win') 
+simul_plot(D) 
+} 
+ 

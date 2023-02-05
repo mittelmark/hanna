@@ -42,9 +42,12 @@ U
 
 Now a directed graph where an edge is drawn from the winning team to the loosing team in a match.
 
-```{r}
+```{r fig.width=8,fig.height=4,out.width=1000}
 D = simul_graph(res$M,mode='win')
 D
+par(mfrow=c(1,2),mai=rep(0.2,4))
+simul_plot(D)
+simul_plot(U)
 ```
 
 ## EOF
