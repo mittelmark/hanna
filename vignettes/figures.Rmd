@@ -1,0 +1,53 @@
+---
+title: "Figures for the paper ..."
+author: Detlef Groth
+date: 2023-02-05
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+Below you find the code for the paper ...
+
+```{r}
+x=1
+print(x)
+```
+
+Season pairings:
+
+```{r}
+library(hanna)
+simul_pairings(LETTERS[1:4])
+```
+
+Play a single round:
+
+```{r}
+res=simul_season(LETTERS[1:6])
+res
+```
+
+Let's now conver this to an undirected graph where edges are drawn between
+teams which draw against each other:
+
+```{r}
+U = simul_graph(res$M,mode='draw')
+U
+```
+
+Now a directed graph where an edge is drawn from the winning team to the loosing team in a match.
+
+```{r}
+D = simul_graph(res$M,mode='win')
+D
+```
+
+## EOF
+
+
+
