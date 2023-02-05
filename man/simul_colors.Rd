@@ -7,13 +7,14 @@
   nodes with in and out going edges ge the second color and nodes with 
   only outgoing edges the third color. 
 } 
-\usage{ simul_colors(x,col=c('grey80','salmon','red')) } 
+\usage{ simul_colors(x,col=c('grey80','indianred1','indianred3')) } 
 \arguments{ 
   \item{x}{ adjacency matrix } 
   \item{col}{color vector with three colors, default: c('grey80','salmon','red')} 
 } 
 \value{ vector of colors with length of node numner } 
 \examples{ 
+set.seed(124) 
 res=simul_season(LETTERS[1:8]) 
 D = simul_graph(res$M,mode='win') 
 cols=simul_colors(D) 

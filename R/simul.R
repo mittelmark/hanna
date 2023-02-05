@@ -490,13 +490,14 @@ simul_layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interactiv
 #'   nodes with in and out going edges ge the second color and nodes with
 #'   only outgoing edges the third color.
 #' }
-#' \usage{ simul_colors(x,col=c('grey80','salmon','red')) }
+#' \usage{ simul_colors(x,col=c('grey80','indianred1','indianred3')) }
 #' \arguments{
 #'   \item{x}{ adjacency matrix }
 #'   \item{col}{color vector with three colors, default: c('grey80','salmon','red')}
 #' }
 #' \value{ vector of colors with length of node numner }
 #' \examples{
+#' set.seed(124)
 #' res=simul_season(LETTERS[1:8])
 #' D = simul_graph(res$M,mode='win')
 #' cols=simul_colors(D)
@@ -505,14 +506,126 @@ simul_layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interactiv
 #' \seealso{ \code{\link{testprint}} }
 #'
 
-simul_colors <- function (x,col=c('grey80','salmon','red')) {
+simul_colors <- function (x,col=c('grey80','indianred1','indianred3')) {
     out=apply(x,1,sum)
     ins=apply(x,2,sum)
     cols=rep(col[1],ncol(x))
-    cols[out>0 & ins > 0]=cols[2]
-    cols[out>0 & ins == 0]=cols[3]
+    cols[out>0 & ins > 0]=col[2]
+    cols[out>0 & ins == 0]=col[3]
     return(cols)
 }
+
+#' \name{simul_compare}
+#' \alias{simul_compare}
+#' \title{ Compare the different models for a certain number of seasons. }
+#' \description{
+#'   This function does a comparison for different models determine
+#'   the amount of triads after a certain number of seasons.
+#' }
+#' \usage{ simul_compare(n=5,agents=12,seasons=3) }
+#' \arguments{
+#'   \item{n}{ how many repeats per model, default: 5}
+#'   \item{agents}{how many agents/teams, default: 12} 
+#'   \item{seasons}{ow many seasons, default: 3}
+#' }
+#' 
+#' \value{data frame with the results, last column model type}
+#' \examples{
+#'  set.seed(128)
+#'  par(mfrow=c(1,3)) 
+#'  res.df=simul_compare(n=5,seasons=3)
+#'  for (mod in c("null","chance","gain")) { 
+#'    rest=t(scale(t(res.df[res.df$model==mod,1:5])))
+#'    boxplot(rest,main=mod,ylim=c(-2,2)) 
+#'    lines(1:5,apply(rest,2,median))
+#'  }
+#' }
+simul_compare <- function (n=5,agents=12,seasons=3) {
+    nodes=agents
+    res.df=data.frame(dd=c(),ds=c(),pa=c(),tr=c(),cy=c())
+    for (mod in c("null","chance","gain","keystone")) {
+        for (i in 1:n) {
+            res=simul_season(LETTERS[1:nodes],model=mod)
+            for (s in 2:seasons) {
+                res=simul_season(LETTERS[1:nodes],token=res$token,model=mod)   
+            }
+            res.df=rbind(res.df,t(as.data.frame(unlist(simul_triads(simul_graph(res$M,mode="win"))))))
+        }   
+    }   
+    res.df=cbind(res.df,model=rep(c("null","chance","gain","keystone"),each=n))
+    rownames(res.df)=1:nrow(res.df)
+    return(res.df)
+}
+
+#' \name{simul_triads}
+#' \alias{simul_triads}
+#' \title{ Calculate the number of two and tri edge triads. }
+#' \usage{ simul_triads(x) }
+#' \description{
+#'   This function calculates the number of two and tri edge triads for
+#'    directed graphs. The following triads are possible:
+#' \itemize{
+#'    \item double-dominant (dd) A->B; A->C
+#'    \item double-subordinate (ds) A->B; C->B
+#'    \item pass-along (pa) A->B->C
+#'    \item transitive (tr) A->B; A->C ; B->C
+#'    \item cycle (cy) A->B->C->A
+#' }
+#' }
+#' \arguments{
+#'   \item{x}{ adjacency matrix }
+#' }
+#' \value{ list object with the following components:
+#'  \itemize{
+#'    \item{dd}{number of double dominant triads}
+#'    \item{ds}{number of double subordinate triads}
+#'    \item{pa}{number of pass-along triads}
+#'    \item{tr}{number of transitive triads}
+#'    \item{cy}{number of cycle triads}
+#'  }
+#' }
+#' \examples{
+#' A = matrix(rbinom(49,1,p=0.3),nrow=7)
+#' diag(A)=0
+#' A[lower.tri(A)]=0
+#' rownames(A)=colnames(A)=LETTERS[1:7]
+#' simul_plot(A)
+#' unlist(simul_triads(A))
+#' }
+
+simul_triads <- function (x) {
+    # count two and tri edge triads
+    g=x
+    res=list(dd=0,ds=0,pa=0,tr=0,cy=0)
+    if (max(g[upper.tri(g)]+t(g)[upper.tri(g)])>1) {
+        stop("Only directed graphs can be used for triad calculations")
+    }
+    for (i in 1:(ncol(g)-2)) {
+        for (j in (i+1):(ncol(g)-1)) {
+            for (k in (j+1):(ncol(g))) {
+                h=g[c(i,j,k),c(i,j,k)]
+                if (sum(h)==2) {
+                    if (max(apply(h,1,sum))==2) {
+                        res$dd=res$dd+1
+                    } else if (max(apply(h,2,sum))==2) {
+                        res$ds=res$ds+1
+                    } else {
+                        res$pa=res$pa+1
+                    }
+                } else if (sum(h) == 3) {
+                    if (max(apply(h,1,sum))==2) {
+                        res$tr=res$tr+1
+                    } else {
+                        res$cy=res$cy+1
+                    }
+                }
+                    
+            }
+        }
+    }
+    return(res)
+}
+
 # private functions
 
 D2u <- function (g) {

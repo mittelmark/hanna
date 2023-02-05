@@ -46,10 +46,80 @@ Now a directed graph where an edge is drawn from the winning team to the loosing
 D = simul_graph(res$M,mode='win')
 D
 par(mfrow=c(1,2),mai=rep(0.2,4))
-simul_plot(D)
+simul_plot(D,vertex.color=simul_colors(D))
 simul_plot(U)
 ```
 
+## Model comparison
+
+```{r fig.width=14,fig.height=14,out.width=900}
+par(mfrow=c(4,4),mai=c(0.0,0.5,0.5,0.0))
+colors=c('grey80','#ff9999','#bb5555')
+n=12
+for (mode in c('null','last','gain','keystone')) {
+    for (i in 1:30) {
+        if (i == 1) {
+            if (mode == "keystone") {
+                res=simul_season(LETTERS[1:n],model=mode,token=c(10,rep(5,n-1)))
+            } else {
+               res=simul_season(LETTERS[1:n],model=mode)
+            }
+        } else {
+            res=simul_season(LETTERS[1:12],token=res$token,model=mode)
+        }  
+        D = simul_graph(res$M,mode='win') 
+        cols=simul_colors(D,col=colors)
+        if (i %in% c(1,5,10,30)) {
+            simul_plot(D,vertex.color=cols,vertex.size=0.8)
+            if (i == 1) {
+                if (mode == "gain") {
+                   mtext("winlo",side=2,cex=1.5,line=0)
+                } else {
+                    mtext(mode,side=2,cex=1.5,line=0)
+                }   
+            }
+        
+            if (mode == "null") {
+                mtext(i,side=3,line=0,cex=1.5)
+            }
+        }
+    }   
+}
+```
+
+## Triad counting
+
+```{r fig.width=14,fig.height=14,out.width=1000}
+set.seed(128) 
+par(mfrow=c(3,3),omi=c(0.5,0.7,0.5,0.3),mai=rep(0.2,4))  
+
+for (i in c(1,5,10)) {
+    res.df=simul_compare(n=10,seasons=i) 
+    for (mod in c("null","gain","keystone")) {  
+       rest=t(scale(t(res.df[res.df$model==mod,1:5]))) 
+       boxplot(rest,ylim=c(-2,2),axes=FALSE) 
+       lines(1:5,apply(rest,2,median)) 
+       if (i == 1) {
+          if (mod == "gain") {
+            mtext("winlo",side=3,cex=1.5,line=1)
+          } else {
+            mtext(mod,side=3,cex=1.5,line=1)
+          }
+       }
+       box()
+       if (mod == "null") {
+           mtext(i,side=2,cex=1.5,line=3)
+       }
+       if (i == 10) {
+         axis(1,labels=colnames(rest),at=1:5,cex.axis=1.5)
+       }
+       if (mod == "null") {
+         axis(2,cex.axis=1.5)
+       }
+    } 
+}
+
+```
 ## EOF
 
 
