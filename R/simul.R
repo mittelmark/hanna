@@ -201,3 +201,126 @@ simul_graph <- function (x,mode="draw") {
     }
     return(A)
 }
+
+
+#' \name{simul_plot}
+#' \alias{simul_plot}
+#' \title{ plot an adjacency matrix }
+#' \description{
+#'   This function plots an adjacency matrix representing an undirected or
+#'   directed graph using different layout mechanisms.
+#' }
+#' \usage{simulplot(x,layout='sam',
+#'          vertex.size=1,vertex.labels=NULL,vertex.color="grey80",vertex.cex=1,vertex.pch=19,
+#'          edge.color="grey40",edge.lty=1,edge.text=NULL,edge.cex=1,edge.pch=0,
+#'          edge.lwd=3,weighted=FALSE,
+#'          star.center=NULL,...)}
+#'
+#' \arguments{
+#'   \item{x}{ an adjacency matrix }
+#'   \item{layout}{either 'mds','sam', 'circle', 'star', 'graphviz' or an two column matrix or data frame with x and y coordinates, if 'graphviz' only teh default output of the graphviz tools can be shown, default: 'sam'}
+#'   \item{vertex.size}{the size of the vertex circles, default: 1}
+#'   \item{vertex.labels}{alternative names shown in the vertices, if not given using the rownames of the adjacency matrix, default: NULL}
+#'   \item{vertex.color}{the color of the vertices, default: 'salmon'}
+#'   \item{vertex.cex}{the relative font size of the vertice labels, default: 1}
+#'   \item{vertex.pch}{plotting character for the vertices, default: 19}
+#'   \item{edge.color}{either a single color or a matrix with color names of the same same shape as the adjacency matrix, default: 'grey40'}
+#'   \item{edge.lty}{either a single integer 1-4 representing the line type or a matrix with integers in this range of the same same shape as the adjacency matrix, default: 1}
+#'   \item{edge.text}{optional matrix to give edge labels, default: NULL}
+#'   \item{edge.cex}{optional character expansion for the edge label and the underlying plotting character, default: 1}
+#'   \item{edge.pch}{optional character code for the edge.text, default: 0}
+#'   \item{edge.lwd}{the line width for the edges}
+#'   \item{star.center}{for layout 'star' the central node, default: NULL}
+#'   \item{\ldots}{arguments delegated to the plot function}
+#' }
+
+simul_plot = function (x,layout='sam',
+                       vertex.size=1,vertex.labels=NULL,vertex.color="grey80",vertex.cex=1,vertex.pch=19,
+                        edge.color="grey40",edge.lty=1,edge.text=NULL,edge.cex=1,edge.pch=0,
+                        edge.lwd=3,weighted=FALSE,
+                        star.center=NULL,...) {
+    A=x
+    if (is.matrix(layout) | is.data.frame(layout)) {
+        if (ncol(layout) != 2) {
+            stop("If a layout matrix or data frame is given two columns are required!")
+        }
+    } else if (layout %in% c("sam","mds","circle","star")) {
+        layout=simul_layout(A,mode=layout,star.center=star.center)
+    } else {
+        stop("Wrong layout. Either a two column matrix or one of 'sam','mds','circle' or 'star' must be given!")
+    }
+    if (!is.null(vertex.labels)) {
+        colnames(A)=rownames(A)=vertex.labels
+        rownames(layout)=vertex.labels
+    }
+    if (length(vertex.color) == 1) {
+        vertex.color=rep(vertex.color,nrow(g))
+    }
+    arrow <- function (x,y,cut=0.6,lwd=2,lty=1,arrow.col="#666666",...) {
+        hx <- (1 - cut) * x[1] + cut * x[2]
+        hy <- (1 - cut) * y[1] + cut * y[2]
+        arrows(hx,hy,x[2],y[2],lwd=lwd,code=0,col=arrow.col,lty=lty,...)
+        for (a in c(20,15,10,5)) {
+            arrows(x[1],y[1],hx,hy,length=0.06*lwd,angle=a,lwd=lwd,col=arrow.col,lty=lty,...)
+        }
+    }
+    xr=diff(range(layout[,1])/10)
+    
+    yr=diff(range(layout[,2])/10)
+    xlim=c(min(layout[,1])-xr,max(layout[,1])+xr)
+    ylim=c(min(layout[,2])-yr,max(layout[,2])+yr)
+    g="directed"
+    if (identical(A,t(A))) {
+        g="undirected"
+    }
+    plot(layout,xlim=xlim,ylim=ylim,axes=FALSE,xlab="",ylab="",...)
+    for (i in 1:nrow(A)) {
+        idx=which(A[i,]!= 0)
+        for (j in idx) {
+            if (g=="undirected" & i > j) {
+                next
+            }
+            wlwd=edge.lwd
+            if (weighted) {
+                wlwd=edge.lwd+abs(A[i,j])
+            }
+            if (is.matrix(edge.color)) {
+                col=edge.color[i,j]
+            } else {
+                col=edge.color
+            }
+            if (length(edge.lty)>1) {
+                clty=edge.lty[i,j]
+            } else {
+                clty=edge.lty
+            }
+            x=layout[c(i,j),1]
+            y=layout[c(i,j),2]
+            hx <- 0.5 * x[1] + 0.5 * x[2]
+            hy <- 0.5 * y[1] + 0.5 * y[2]
+            if (g=="undirected") {
+                lines(x,y,lwd=wlwd,col=col,lty=clty)
+                if (is.matrix(edge.text)) {
+                    jitx=  0 ; #diff(range(axTicks(1)))/16
+                    jity= 0 ; diff(range(axTicks(2)))/16
+                    if (edge.pch>0) {
+                        points(hx,hy,pch=edge.pch,cex=5*edge.cex,col="#cccccc99")
+                    }
+                    text(hx+jitx,hy+jity,edge.text[i,j],cex=edge.cex,col="#000099")
+                }
+            } else {
+                arrow(layout[c(i,j),1],layout[c(i,j),2],lwd=wlwd,arrow.col=col,lty=clty)
+                if (is.matrix(edge.text)) {
+                    if (edge.pch>0) {
+                        points(hx,hy,pch=edge.pch,cex=5*edge.cex,col="#cccccc99")
+                    }
+                    text(hx,hy,edge.text[i,j],cex=edge.cex,col="#000099")       
+                }
+
+            }
+        }
+    }
+    points(layout,pch=vertex.pch,cex=6*vertex.size+0.4,col="black")
+    points(layout,pch=vertex.pch,cex=6*vertex.size,col=vertex.color)
+    text(layout,rownames(A),cex=vertex.cex)
+}
