@@ -6,5 +6,7 @@ Date: 2023-02-05
 Author: Detlef Groth, University of Potsdam, Germany
 Maintainer: Detlef Groth <dgroth@uni-potsdam.de>
 Description: R code for the paper.
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
 License: MIT + file LICENSE
 NeedsCompilation: no

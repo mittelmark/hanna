@@ -16,7 +16,7 @@ for (file in args) {
             mandir = sub("R/.+","man/",file)
             fout = file(paste(mandir,name,".Rd",sep=""),"w")
             
-        } else if (flag & grepl("^[a-zA-Z ]*$",line)) {
+        } else if (flag & (grepl('^[a-zA-Z" ].*',line) | grepl("^$",line))) {
             flag = FALSE
             close(fout) 
             next
