@@ -16,3 +16,9 @@
    } 
 } 
  
+\examples{ 
+set.seed(123) 
+res=simul_season(LETTERS[1:6],model="null")  
+res 
+simul_plot(res$M) 
+} 

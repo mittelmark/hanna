@@ -16,6 +16,12 @@
 #'    }
 #' }
 #'
+#' \examples{
+#' set.seed(123)
+#' res=simul_season(LETTERS[1:6],model="null") 
+#' res
+#' simul_plot(res$M)
+#' }
 
 ""
 #' \name{simul_pairings}
@@ -79,6 +85,8 @@ simul_pairings <- function (x) {
 #'   \item{token}{ vector of token for each team, which might influence the match outcone, depending on the given model, defaults: 5 }
 #'   \item{model}{ the model given as string, possible values are 'null', 'chance','gain' or 'last', default: 'null' }
 #'   \item{min.value}{ for the model 'last' how low is the minimal value for each team, default: 4}
+#'   \item{memory}{optional vector of last results for each agent}
+#'   \item{memory.length}{how many of last results should be stored, default: 1}
 #' }
 #' \details{
 #'     This function allows you to create matches for all against all in a season and performs the matches
@@ -98,7 +106,7 @@ simul_pairings <- function (x) {
 #' }
 #' 
 
-simul_season <- function (x,token=rep(5,length(x)),model='null',min.value=4) {
+simul_season <- function (x,token=rep(5,length(x)),model='null',min.value=4,memory=NULL,memory.length=1) {
     pairings=simul_pairings(x)
     nms=x
     names(token)=nms
@@ -607,6 +615,7 @@ simul_triads <- function (x) {
     if (max(g[upper.tri(g)]+t(g)[upper.tri(g)])>1) {
         stop("Only directed graphs can be used for triad calculations")
     }
+    cnames=colnames(g)
     for (i in 1:(ncol(g)-2)) {
         for (j in (i+1):(ncol(g)-1)) {
             for (k in (j+1):(ncol(g))) {

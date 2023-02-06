@@ -96,8 +96,10 @@ par(mfrow=c(3,3),omi=c(0.5,0.7,0.5,0.3),mai=rep(0.2,4))
 for (i in c(1,5,10)) {
     res.df=simul_compare(n=10,seasons=i) 
     for (mod in c("null","gain","keystone")) {  
-       rest=t(scale(t(res.df[res.df$model==mod,1:5]))) 
-       boxplot(rest,ylim=c(-2,2),axes=FALSE) 
+       #rest=t(scale(t(res.df[res.df$model==mod,1:5]))) 
+       rest=t(apply(res.df[res.df$model==mod,1:5],1,function(x) { (x/sum(x))*100} ))
+       #rest=cbind(rest,res.df[,6])
+       boxplot(rest,ylim=c(0,100),axes=FALSE) 
        lines(1:5,apply(rest,2,median)) 
        if (i == 1) {
           if (mod == "gain") {
@@ -120,6 +122,7 @@ for (i in c(1,5,10)) {
 }
 
 ```
+
 ## EOF
 
 
