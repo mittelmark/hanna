@@ -52,20 +52,30 @@ simul_plot(U)
 
 ## Model comparison
 
-```{r fig.width=14,fig.height=14,out.width=900}
-par(mfrow=c(4,4),mai=c(0.0,0.5,0.5,0.0))
+```{r fig.width=14,fig.height=18,out.width=900}
+par(mfrow=c(5,4),mai=c(0.0,0.5,0.5,0.0))
 colors=c('grey80','#ff9999','#bb5555')
 n=12
-for (mode in c('null','last','gain','keystone')) {
+for (mode in c('null','memory1','memory5','gain','keystone')) {
     for (i in 1:30) {
         if (i == 1) {
             if (mode == "keystone") {
-                res=simul_season(LETTERS[1:n],model=mode,token=c(10,rep(5,n-1)))
+                res=simul_season(LETTERS[1:n],model=mode,token=c(24,24,rep(12,n-2)))
+            } else if (mode=="memory1") {
+               res=simul_season(LETTERS[1:n],model=mode,memory.length=1)
+            } else if (mode=="memory5") {
+               res=simul_season(LETTERS[1:n],model=mode,memory.length=5)
             } else {
                res=simul_season(LETTERS[1:n],model=mode)
             }
         } else {
-            res=simul_season(LETTERS[1:12],token=res$token,model=mode)
+            if (mode=="memory1") {
+               res=simul_season(LETTERS[1:n],model=mode,memory.length=1,memory=res$memory)
+            } else if (mode=="memory5") {
+               res=simul_season(LETTERS[1:n],model=mode,memory.length=5,memory=res$memory)
+            }  else {
+                res=simul_season(LETTERS[1:12],token=res$token,model=mode)
+            }
         }  
         D = simul_graph(res$M,mode='win') 
         cols=simul_colors(D,col=colors)
@@ -91,11 +101,10 @@ for (mode in c('null','last','gain','keystone')) {
 
 ```{r fig.width=14,fig.height=14,out.width=1000}
 set.seed(128) 
-par(mfrow=c(3,3),omi=c(0.5,0.7,0.5,0.3),mai=rep(0.2,4))  
-
-for (i in c(1,5,10)) {
+par(mfcol=c(5,4),omi=c(0.5,0.7,0.5,0.3),mai=rep(0.2,4))  
+for (i in c(1,5,10,30)) {
     res.df=simul_compare(n=10,seasons=i) 
-    for (mod in c("null","gain","keystone")) {  
+    for (mod in c("null","memory1", "memory5","gain","keystone")) {  
        #rest=t(scale(t(res.df[res.df$model==mod,1:5]))) 
        rest=t(apply(res.df[res.df$model==mod,1:5],1,function(x) { (x/sum(x))*100} ))
        #rest=cbind(rest,res.df[,6])
@@ -103,26 +112,49 @@ for (i in c(1,5,10)) {
        lines(1:5,apply(rest,2,median)) 
        if (i == 1) {
           if (mod == "gain") {
-            mtext("winlo",side=3,cex=1.5,line=1)
+            mtext("winlo",side=2,cex=1.5,line=3)
           } else {
-            mtext(mod,side=3,cex=1.5,line=1)
+            mtext(mod,side=2,cex=1.5,line=3)
           }
        }
        box()
        if (mod == "null") {
-           mtext(i,side=2,cex=1.5,line=3)
+           mtext(i,side=3,cex=1.5,line=3)
        }
-       if (i == 10) {
+       if (i == 1) {
+             axis(2,cex.axis=1.5)
+
+       }
+       if (mod == "keystone") {
          axis(1,labels=colnames(rest),at=1:5,cex.axis=1.5)
        }
-       if (mod == "null") {
-         axis(2,cex.axis=1.5)
-       }
+        if (i == 1 & mod == "null") {
+            res.all=cbind(res.df,iter=rep(i,nrow(res.df)))
+        } else {
+            res.all=rbind(res.all,cbind(res.df,iter=rep(i,nrow(res.df))))
+        }
     } 
 }
 
 ```
 
+## Measure sd and mean for the average path lengths
+
+```{r}
+agg1=with(res.all,aggregate(pls, by=list(model,iter), mean))
+agg2=with(res.all,aggregate(pls, by=list(model,iter), sd))
+head(agg1,n=20)
+head(agg2,n=20)
+agg=cbind(agg1,agg2$x)
+colnames(agg)=c('model','seasons','mean','sd')
+head(agg)
+```
+
+
+```{r}
+library(knitr)
+knitr::kable(agg)
+```
 ## EOF
 
 

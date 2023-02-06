@@ -1,7 +1,7 @@
 \name{simul_triads} 
 \alias{simul_triads} 
 \title{ Calculate the number of two and tri edge triads. } 
-\usage{ simul_triads(x) } 
+\usage{ simul_triads(x,percent=FALSE) } 
 \description{ 
   This function calculates the number of two and tri edge triads for 
    directed graphs. The following triads are possible: 
@@ -15,6 +15,7 @@
 } 
 \arguments{ 
   \item{x}{ adjacency matrix } 
+  \item{percent}{ should the results be return not wihh total numbers but in percent, default: FALSE} 
 } 
 \value{ list object with the following components: 
  \itemize{ 

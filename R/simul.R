@@ -5,13 +5,15 @@
 #'   The function with the simul prefix perform simulations of winner-looser effects for the paper ...
 #'   The following functions are implemented:
 #'   \itemize{
-#'      \item \code{\link{simul_pairings}} - create round pairings for a season
-#'      \item \code{\link{simul_season}} - reate matches for everyone against everyone using the given model
-#'      \item \code{\link{simul_graph}} - create a adjacency matrix out of the results for a match season
-#'      \item \code{\link{simul_plot}} - plot an adjacency matrix 
-#'      \item \code{\link{simul_layout}} - calculate a plot layout for an adjacency matrix
+#'      \item \code{\link{simul_average_path_length}} - calucate the average path length for a given adjacency matrix
 #'      \item \code{\link{simul_colors}} - create a color vector based on node degrees 
 #'      \item \code{\link{simul_compare}} - compare the different models for a certain number of seasons
+#'      \item \code{\link{simul_graph}} - create a adjacency matrix out of the results for a match season
+#'      \item \code{\link{simul_layout}} - calculate a plot layout for an adjacency matrix
+#'      \item \code{\link{simul_pairings}} - create round pairings for a season
+#'      \item \code{\link{simul_plot}} - plot an adjacency matrix 
+#'      \item \code{\link{simul_season}} - create matches for everyone against everyone using the given model
+#'      \item \code{\link{simul_shortest_paths}} - caluclate the shortest paths between all nodes of an adjacency matrix 
 #'      \item \code{\link{simul_triads}} - alculate the number of two and tri edge triads
 #'    }
 #' }
@@ -78,7 +80,7 @@ simul_pairings <- function (x) {
 #'   This function creates pairings for a tournament where in every round.
 #'   The actual match will give chances based on a certain amount of tokens in dependence of the given model.
 #' }
-#' \usage{ simul_season(x,token=rep(5,length(x)),model="null",min.value=4) }
+#' \usage{ simul_season(x,token=rep(length(x),length(x)),model="null",min.value=4,memory=NULL,memory.length=1) }
 #'
 #' \arguments{
 #'   \item{x}{ vector of teams }
@@ -97,6 +99,7 @@ simul_pairings <- function (x) {
 #'      \item{M}{matrix of results where 1 is a win, -1 is a loss and 0 is a draw}
 #'      \item{token}{vector of current tokens for each team}
 #'      \item{model}{the choosen model}
+#'      \item{memory}{list with last results for each agent}
 #'   }
 #' }
 #' \examples{
@@ -106,8 +109,12 @@ simul_pairings <- function (x) {
 #' }
 #' 
 
-simul_season <- function (x,token=rep(5,length(x)),model='null',min.value=4,memory=NULL,memory.length=1) {
+simul_season <- function (x,token=rep(length(x),length(x)),model='null',min.value=4,memory=NULL,memory.length=1) {
     pairings=simul_pairings(x)
+    if (class(memory) == "NULL") {
+        memory=lapply(x,function(x) { return(rep(0,memory.length+1)) })
+        names(memory)=x
+    }
     nms=x
     names(token)=nms
     x=matrix(0,nrow=length(x),ncol=length(x))
@@ -117,9 +124,15 @@ simul_season <- function (x,token=rep(5,length(x)),model='null',min.value=4,memo
         A=pairings[i,2]
         B=pairings[i,3]
         if (model=="null") {
-            smp=c(rep(A,5),rep(B,5)) 
+            smp=c(rep(A,length(nms)),rep(B,length(nms)))
         } else if (model == "chance") {
             smp=c(A,A,B,B,rep(A,token[A]),rep(B,token[B]))
+        } else if (model == "memory") {
+            #tokA=memory.length+sum(memory[[A]])
+            #tokB=memory.length+sum(memory[[B]])
+            tokA=5+token[[A]]-memory[[A]][length(memory[[A]])]
+            tokB=5+token[[B]]-memory[[B]][length(memory[[B]])]
+            smp=c(rep(A,tokA),rep(B,tokB)) 
         } else {
             if (token[A]> 0 & token[B] > 0) {
                 smp=c(rep(A,token[A]),rep(B,token[B]))
@@ -151,6 +164,13 @@ simul_season <- function (x,token=rep(5,length(x)),model='null',min.value=4,memo
         }
         x[A,B]=res[1]
         x[B,A]=res[2]
+        if (model == "memory") {
+            #res[1],
+            valA=c(token[[A]],memory[[A]])[1:memory.length]
+            valB=c(token[[B]],memory[[B]])[1:memory.length]
+            memory[[A]]=valA
+            memory[[B]]=valB
+        }
         token[A]=token[A] + res[1]
         token[B]=token[B] + res[2]
         if (model == "last") {
@@ -161,8 +181,8 @@ simul_season <- function (x,token=rep(5,length(x)),model='null',min.value=4,memo
                 token[A]=10-min.value
                 token[B]=min.value
             } else {
-                token[A]=5
-                token[B]=5
+                token[A]=length(nms)
+                token[B]=length(nms)
             }
         }
         if (token[A]<0) {
@@ -173,8 +193,63 @@ simul_season <- function (x,token=rep(5,length(x)),model='null',min.value=4,memo
             token[B]=0
             token[A]=token[A]-1
         }
+
     }
-    return(list(M=x,token=token,model=model))
+    return(list(M=x,token=token,model=model,memory=memory))
+}
+
+Simul_season2 <- function (x,memory=NULL,
+                           memory.length=0) {
+    pairings=simul_pairings(x)
+    nms=x
+    token=rep(length(nms),length(nms))
+    tok=length(nms)
+    names(token)=nms
+    if (class(memory) != "NULL") {
+        token=token+unlist(lapply(memory,sum))
+        print(token)
+    } else {
+        memory=lapply(x,function(x) { return(rep(0,memory.length+1)) })
+        names(memory)=nms
+    }
+    x=matrix(0,nrow=length(x),ncol=length(x))
+    rownames(x)=colnames(x)=nms
+    vec=rownames(x)
+    for (i in 1:nrow(pairings)) {
+        A=pairings[i,2]
+        B=pairings[i,3]
+        tokA=tok+sum(memory[[A]])
+        tokB=tok+sum(memory[[B]])
+        smp=c(rep(A,tokA),rep(B,tokB)) 
+        smp=sample(smp,2)
+        if (smp[1]!=smp[2]) {
+            res=c(0,0)
+        } else if (smp[1] == A) {
+            res=c(1,-1)
+        } else if (smp[1] == B) {
+            res=c(-1,1)
+        }
+        x[A,B]=res[1]
+        x[B,A]=res[2]
+        valA=c(res[1],memory[[A]])
+        valB=c(res[2],memory[[B]])
+        if (memory.length>0) {
+            memory[[A]]=valA[1:memory.length]
+            memory[[B]]=valB[1:memory.length]
+        } 
+        token[A]=token[A] + res[1]
+        token[B]=token[B] + res[2]
+        if (token[A]<0) {
+            token[A]=0
+            token[B]=token[B]-1
+        }
+        if (token[B]<0) {
+            token[B]=0
+            token[A]=token[A]-1
+        }
+    }
+    return(list(M=x,token=token,memory=memory))
+
 }
 
 #' \name{simul_graph}
@@ -387,7 +462,7 @@ simul_layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interactiv
     }
     if (mode %in% c('mds','sam')) {
         A=Connect(A)
-        sp=Shortest.paths(A)
+        sp=simul_shortest_paths(A)
         xy=cmdscale(sp)
         rownames(xy)=rownames(A)
         if (mode=='mds') {
@@ -558,16 +633,42 @@ simul_colors <- function (x,col=c('grey80','indianred1','indianred3')) {
 simul_compare <- function (n=5,agents=12,seasons=3) {
     nodes=agents
     res.df=data.frame(dd=c(),ds=c(),pa=c(),tr=c(),cy=c())
+    plengths=c()
     for (mod in c("null","chance","gain","keystone")) {
         for (i in 1:n) {
-            res=simul_season(LETTERS[1:nodes],model=mod)
+            if (mod == "keystone") {
+                token=rep(agents,agents)
+                token[1]=token[1]*2
+                token[2]=token[1]
+                names(token)=LETTERS[1:nodes]
+                res=simul_season(LETTERS[1:nodes],model=mod,token=token)
+            } else {
+                res=simul_season(LETTERS[1:nodes],model=mod)
+            }
             for (s in 2:seasons) {
                 res=simul_season(LETTERS[1:nodes],token=res$token,model=mod)   
             }
+            A=res$M
+            A[A<0]=0
+            pl=simul_average_path_length(A,mode="undirected",infinite=agents)
+            plengths=c(plengths,pl)
             res.df=rbind(res.df,t(as.data.frame(unlist(simul_triads(simul_graph(res$M,mode="win"))))))
         }   
     }   
-    res.df=cbind(res.df,model=rep(c("null","chance","gain","keystone"),each=n))
+    for (mem in c(1,3,5)) {
+        for (i in 1:n) {
+            res=simul_season(LETTERS[1:nodes],model="memory",memory.length=mem)
+            for (s in 2:seasons) {
+                res=simul_season(LETTERS[1:nodes],token=res$token,model="memory",memory=res$memory,memory.length=mem)   
+            }
+            A=res$M
+            A[A<0]=0
+            pl=simul_average_path_length(A,mode="undirected",infinite=agents)
+            plengths=c(plengths,pl)
+            res.df=rbind(res.df,t(as.data.frame(unlist(simul_triads(simul_graph(res$M,mode="win"))))))
+        }   
+    }   
+    res.df=cbind(res.df,model=rep(c("null","chance","gain","keystone","memory1","memory3","memory5"),each=n),pls=plengths)
     rownames(res.df)=1:nrow(res.df)
     return(res.df)
 }
@@ -575,7 +676,7 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
 #' \name{simul_triads}
 #' \alias{simul_triads}
 #' \title{ Calculate the number of two and tri edge triads. }
-#' \usage{ simul_triads(x) }
+#' \usage{ simul_triads(x,percent=FALSE) }
 #' \description{
 #'   This function calculates the number of two and tri edge triads for
 #'    directed graphs. The following triads are possible:
@@ -589,6 +690,7 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
 #' }
 #' \arguments{
 #'   \item{x}{ adjacency matrix }
+#'   \item{percent}{ should the results be return not wihh total numbers but in percent, default: FALSE}
 #' }
 #' \value{ list object with the following components:
 #'  \itemize{
@@ -608,9 +710,10 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
 #' unlist(simul_triads(A))
 #' }
 
-simul_triads <- function (x) {
+simul_triads <- function (x,percent=FALSE) {
     # count two and tri edge triads
     g=x
+    g[g<0]=0
     res=list(dd=0,ds=0,pa=0,tr=0,cy=0)
     if (max(g[upper.tri(g)]+t(g)[upper.tri(g)])>1) {
         stop("Only directed graphs can be used for triad calculations")
@@ -639,75 +742,39 @@ simul_triads <- function (x) {
             }
         }
     }
+    if (percent) {
+        res=as.list((unlist(res)/sum(unlist(res)))*100)
+    }
     return(res)
 }
 
-# private functions
+#' \name{simul_shortest_paths}
+#' \alias{simul_shortest_paths}
+#' \title{ Calculate the shortest path between all nodes. }
+#' \usage{ simul_shortest_paths(x,mode="directed") }
+#' \description{
+#'   This function calculates the shortest path between all pair of nodes.
+#'    In unconnected graphs it returns Inf, if the connected option is set to TRUE
+#'    it returns the average path length for the connected nodes, you can as well
+#'    give a value which should be added instead of Inf values, usually this is
+#'    the number of nodes.
+#' }
+#' \arguments{
+#'   \item{x}{ adjacency matrix }
+#'   \item{mode}{ should be either "directed" or "undirected", default: "directed"}
+#' }
+#' \value{ matrix with the pairwise path lengths }
+#' \examples{
+#' set.seed(123)
+#' res=simul_season(LETTERS[1:8])
+#' M=res$M
+#' M[M<0]=0
+#' simul_shortest_paths(M)
+#' simul_shortest_paths(M,mode="undirected")
+#' }
 
-D2u <- function (g) {
-    g[lower.tri(g)]=g[lower.tri(g)]+t(g)[lower.tri(g)]
-    g[upper.tri(g)]=g[upper.tri(g)]+t(g)[upper.tri(g)]    
-    g[g>0]=1
-    g[g<0]=-1
-    return(g)
-}
-
-
-
-Connect = function (g) {
-    A=g
-    A=as.matrix(A)
-    A=A+t(A)
-    A[A>0]=1
-    P=Shortest.paths(A)
-    if (!any(P==Inf)) {
-        return(A)
-    }
-    comp=Components(A)
-    nodes=c()
-    tab=table(comp)
-    for (n in names(tab)) {
-        c=names(which(comp==n))
-        if (tab[[n]] > 2) {
-            Am=A[c,c]
-            # todo min
-            deg=apply(Am,1,sum)
-            idx=which(deg>0)
-            minval=min(deg[idx])
-            idx=which(deg == minval)[1]
-            node=c[idx]
-        } else {
-            node = c[1]
-        }
-        nodes=c(nodes,node)
-    }
-    A[nodes,nodes]=1
-    diag(A)=0
-    return(A)
-}
-
-Components <- function (g) {
-    A=g
-    A=as.matrix(A)
-    A=A+t(A)
-    A[A>0]=1
-    comp=c()
-    P=Shortest.paths(A)
-    nodes=rownames(A)
-    x=1
-    while (length(nodes) > 0) {
-        n=nodes[1]
-        idx=which(P[n,] < Inf)
-        ncomp=rep(x,length(idx))
-        names(ncomp)=rownames(P)[idx]
-        comp=c(comp,ncomp)
-        nodes=setdiff(nodes,rownames(P)[idx])
-        x=x+1
-    }
-    return(comp[rownames(A)])
-}
-
-Shortest.paths <- function (g,mode="directed") {
+simul_shortest_paths <- function (x,mode="directed") {
+    g=x
     A=g
     if (mode == "undirected") {
         A=A+t(A)
@@ -743,3 +810,113 @@ Shortest.paths <- function (g,mode="directed") {
     }
     return(S)
 }
+
+#' \name{simul_average_path_length}
+#' \alias{simul_average_path_length}
+#' \title{ Calculate the average path length between all nodes. }
+#' \usage{ simul_average_path_length(x,mode="directed",unconnected=FALSE,infinite=NULL) }
+#' \description{
+#'   This function calculates the verage shortest path length between all pair of nodes.
+#'    In unconnected graphs it returns Inf, if the connected option is set to TRUE
+#'    it returns the average path length for the connected nodes, you can as well
+#'    give a value which should be added instead of Inf values, usually this is
+#'    the number of nodes.
+#' }
+#' \arguments{
+#'   \item{x}{ adjacency matrix }
+#'   \item{mode}{ should be either "directed" or "undirected", default: "directed" }
+#'   \item{unconnected}{ should only unconnected nodes be used in calculation, default: FALSE}
+#'   \item{infinite}{ a value which should replace Inf values, usually it is the number of nodes }
+#' }
+#' \value{ matrix with the pairwise path lengths }
+#' \examples{
+#' set.seed(123)
+#' res=simul_season(LETTERS[1:8])
+#' M=res$M
+#' M[M<0]=0
+#' simul_shortest_paths(M)
+#' simul_average_path_length(M)
+#' simul_average_path_length(M)
+#' simul_average_path_length(M,unconnected=TRUE)
+#' simul_average_path_length(M,mode="undireced",infinite=nrow(M))
+#' }
+#' 
+
+
+simul_average_path_length <- function (x,mode="directed", unconnected=FALSE, infinite=NULL) {
+    S=simul_shortest_paths(x,mode=mode)
+    if (class(infinite) != "NULL") {
+        S[S==Inf]=infinite
+    }
+    s=c(S[upper.tri(S)],S[lower.tri(S)])
+    if (unconnected) {
+        s=s[s!=Inf]
+    }
+    return(mean(s))
+        
+}
+# private functions
+
+D2u <- function (g) {
+    g[lower.tri(g)]=g[lower.tri(g)]+t(g)[lower.tri(g)]
+    g[upper.tri(g)]=g[upper.tri(g)]+t(g)[upper.tri(g)]    
+    g[g>0]=1
+    g[g<0]=-1
+    return(g)
+}
+
+
+
+Connect = function (g) {
+    A=g
+    A=as.matrix(A)
+    A=A+t(A)
+    A[A>0]=1
+    P=simul_shortest_paths(A)
+    if (!any(P==Inf)) {
+        return(A)
+    }
+    comp=Components(A)
+    nodes=c()
+    tab=table(comp)
+    for (n in names(tab)) {
+        c=names(which(comp==n))
+        if (tab[[n]] > 2) {
+            Am=A[c,c]
+            # todo min
+            deg=apply(Am,1,sum)
+            idx=which(deg>0)
+            minval=min(deg[idx])
+            idx=which(deg == minval)[1]
+            node=c[idx]
+        } else {
+            node = c[1]
+        }
+        nodes=c(nodes,node)
+    }
+    A[nodes,nodes]=1
+    diag(A)=0
+    return(A)
+}
+
+Components <- function (g) {
+    A=g
+    A=as.matrix(A)
+    A=A+t(A)
+    A[A>0]=1
+    comp=c()
+    P=simul_shortest_paths(A)
+    nodes=rownames(A)
+    x=1
+    while (length(nodes) > 0) {
+        n=nodes[1]
+        idx=which(P[n,] < Inf)
+        ncomp=rep(x,length(idx))
+        names(ncomp)=rownames(P)[idx]
+        comp=c(comp,ncomp)
+        nodes=setdiff(nodes,rownames(P)[idx])
+        x=x+1
+    }
+    return(comp[rownames(A)])
+}
+
