@@ -143,10 +143,12 @@ for (i in c(1,5,10,30)) {
 ```{r}
 agg1=with(res.all,aggregate(pls, by=list(model,iter), mean))
 agg2=with(res.all,aggregate(pls, by=list(model,iter), sd))
+agg3=with(res.all,aggregate(wls, by=list(model,iter), mean))
+agg4=with(res.all,aggregate(wls, by=list(model,iter), sd))
 head(agg1,n=20)
 head(agg2,n=20)
-agg=cbind(agg1,agg2$x)
-colnames(agg)=c('model','seasons','mean','sd')
+agg=cbind(agg1,agg2$x,agg3$x,agg4$x)
+colnames(agg)=c('model','seasons','mean.apl','sd.apl','mean.wapl','sd.wapl')
 head(agg)
 ```
 

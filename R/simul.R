@@ -634,6 +634,7 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
     nodes=agents
     res.df=data.frame(dd=c(),ds=c(),pa=c(),tr=c(),cy=c())
     plengths=c()
+    wlengths=c()
     for (mod in c("null","chance","gain","keystone")) {
         for (i in 1:n) {
             if (mod == "keystone") {
@@ -650,8 +651,13 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
             }
             A=res$M
             A[A<0]=0
-            pl=simul_average_path_length(A,mode="directed",infinite=agents)
+            A=D2u(A)
+            pl=simul_average_path_length(A,mode="undirected",infinite=agents)
             plengths=c(plengths,pl)
+            W=Simul_g2w(A)
+            wl=igraph::shortest.paths(igraph::graph.adjacency(W,weighted=TRUE,mode="undirected"))
+            wl=mean(wl[upper.tri(wl)])
+            wlengths=c(wlengths,wl)
             res.df=rbind(res.df,t(as.data.frame(unlist(simul_triads(simul_graph(res$M,mode="win"))))))
         }   
     }   
@@ -663,12 +669,17 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
             }
             A=res$M
             A[A<0]=0
-            pl=simul_average_path_length(A,mode="directed",infinite=agents)
+            A=D2u(A)
+            pl=simul_average_path_length(A,mode="undirected",infinite=agents)
             plengths=c(plengths,pl)
+            W=Simul_g2w(A)
+            wl=igraph::shortest.paths(igraph::graph.adjacency(W,weighted=TRUE,mode="undirected"))
+            wl=mean(wl[upper.tri(wl)])
+            wlengths=c(wlengths,wl)
             res.df=rbind(res.df,t(as.data.frame(unlist(simul_triads(simul_graph(res$M,mode="win"))))))
         }   
     }   
-    res.df=cbind(res.df,model=rep(c("null","chance","gain","keystone","memory1","memory3","memory5"),each=n),pls=plengths)
+    res.df=cbind(res.df,model=rep(c("null","chance","gain","keystone","memory1","memory3","memory5"),each=n),pls=plengths,wls=wlengths)
     rownames(res.df)=1:nrow(res.df)
     return(res.df)
 }
@@ -825,16 +836,16 @@ Simul_shortest_paths <- function (x,mode="directed",FUNC=max) {
 
     }
     S=A
-    S[]=Inf
+    S[S==0]=Inf
     diag(S)=0
-    x=1
-    S[A > 0 & A < Inf]=1
+    x=0
+    #S[A > 0 & A < Inf]=1
     while (TRUE) { 
         flag = FALSE 
         for (m in 1:nrow(S)) {
-            ns=which(S[m,] == x)
+            ns=which(S[m,] > 0)
             for (n in ns) {
-                for (o in which(A[n,]==1)) {
+                for (o in which(A[n,]>0)) {
                     if (o != m) {
                         flag = TRUE
                         if (S[m,o] > x + 1) {
@@ -1044,13 +1055,16 @@ Components <- function (g) {
 }
 
 Simul_g2w <- function (x) {
-    x[x<0]=1
+    x[x<0]=0
+    x[x>0]=1
     u=D2u(x)
     degrees = apply(u,1,function(x) { return(length(which(x!= 0))) })
-    w=u/degrees
+    w=u
     for (i in 1:(nrow(w)-1)) {
-        for (j in i:nrow(w)) {
-            w[i,j]=w[j,i]=min(w[i,j],w[j,i])
+        for (j in (i+1):nrow(w)) {
+            if (u[i,j]>0) {
+                w[i,j]=w[j,i]=1/sqrt((degrees[i]^2+degrees[j]^2))
+            }
         }
     }
     return(w)
