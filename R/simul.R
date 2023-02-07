@@ -650,7 +650,7 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
             }
             A=res$M
             A[A<0]=0
-            pl=simul_average_path_length(A,mode="undirected",infinite=agents)
+            pl=simul_average_path_length(A,mode="directed",infinite=agents)
             plengths=c(plengths,pl)
             res.df=rbind(res.df,t(as.data.frame(unlist(simul_triads(simul_graph(res$M,mode="win"))))))
         }   
@@ -663,7 +663,7 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
             }
             A=res$M
             A[A<0]=0
-            pl=simul_average_path_length(A,mode="undirected",infinite=agents)
+            pl=simul_average_path_length(A,mode="directed",infinite=agents)
             plengths=c(plengths,pl)
             res.df=rbind(res.df,t(as.data.frame(unlist(simul_triads(simul_graph(res$M,mode="win"))))))
         }   
@@ -811,12 +811,56 @@ simul_shortest_paths <- function (x,mode="directed") {
     return(S)
 }
 
+Simul_shortest_paths <- function (x,mode="directed",FUNC=max) {
+    g=x
+    A=g
+    if (mode == "undirected") {
+        #A=A+t(A)
+        #A[A!=0]=1
+        for (i in 1:(nrow(A)-1)) {
+            for (j in i:nrow(A)) {
+                A[i,j]=A[j,i]=FUNC(A[i,j],A[j,i])
+            }
+        }
+
+    }
+    S=A
+    S[]=Inf
+    diag(S)=0
+    x=1
+    S[A > 0 & A < Inf]=1
+    while (TRUE) { 
+        flag = FALSE 
+        for (m in 1:nrow(S)) {
+            ns=which(S[m,] == x)
+            for (n in ns) {
+                for (o in which(A[n,]==1)) {
+                    if (o != m) {
+                        flag = TRUE
+                        if (S[m,o] > x + 1) {
+                            S[m,o]=x+1
+                            if (mode == "undirected") {
+                                S[o,m]=x+1
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (!flag) {
+            break
+        }
+        x=x+1
+    }
+    return(S)
+}
+
 #' \name{simul_average_path_length}
 #' \alias{simul_average_path_length}
 #' \title{ Calculate the average path length between all nodes. }
 #' \usage{ simul_average_path_length(x,mode="directed",unconnected=FALSE,infinite=NULL) }
 #' \description{
-#'   This function calculates the verage shortest path length between all pair of nodes.
+#'   This function calculates the average shortest path length between all pair of nodes.
 #'    In unconnected graphs it returns Inf, if the connected option is set to TRUE
 #'    it returns the average path length for the connected nodes, you can as well
 #'    give a value which should be added instead of Inf values, usually this is
@@ -826,7 +870,52 @@ simul_shortest_paths <- function (x,mode="directed") {
 #'   \item{x}{ adjacency matrix }
 #'   \item{mode}{ should be either "directed" or "undirected", default: "directed" }
 #'   \item{unconnected}{ should only unconnected nodes be used in calculation, default: FALSE}
-#'   \item{infinite}{ a value which should replace Inf values, usually it is the number of nodes }
+#'   \item{infinite}{ a value which should replace Inf values, usually it is the number of nodes, default: NULL }
+#' }
+#' \value{ matrix with the pairwise path lengths }
+#' \examples{
+#' set.seed(123)
+#' res=simul_season(LETTERS[1:8])
+#' M=res$M
+#' M[M<0]=0
+#' simul_shortest_paths(M)
+#' simul_average_path_length(M)
+#' simul_eccentricity(M)
+#' simul_eccentricity(M,unconnected=TRUE)
+#' simul_eccentricity(M,mode="undireced",infinite=nrow(M))
+#' }
+#' 
+
+simul_average_path_length <- function (x,mode="directed", unconnected=FALSE, infinite=NULL) {
+     S=simul_shortest_paths(x,mode=mode)
+     if (class(infinite) != "NULL") {
+         S[S==Inf]=infinite
+     }
+    s=c(S[upper.tri(S)],S[lower.tri(S)])
+    if (unconnected) {
+        s=s[s!=Inf]
+    }
+    return(mean(s))
+        
+}
+
+
+#' \name{simul_eccentricity}
+#' \alias{simul_eccentricity}
+#' \title{ Calculate the eccentricity centrality for all nodes. }
+#' \usage{ simul_eccentricity(x,mode="directed",unconnected=FALSE,infinite=NULL) }
+#' \description{
+#'   This function calculates the inverse of the longest shortest path for each node.
+#'    In unconnected graphs it returns Inf, if the connected option is set to TRUE
+#'    it returns the value between connected nodes only, you can as well
+#'    give a value which should be added instead of Inf values using the infinite argument, usually this is
+#'    the number of nodes.
+#' }
+#' \arguments{
+#'   \item{x}{ adjacency matrix }
+#'   \item{mode}{ should be either "directed" or "undirected", default: "directed" }
+#'   \item{unconnected}{ should only unconnected nodes be used in calculation, default: FALSE}
+#'   \item{infinite}{ a value which should replace Inf values, usually it is the number of nodes,default: NULL }
 #' }
 #' \value{ matrix with the pairwise path lengths }
 #' \examples{
@@ -842,19 +931,53 @@ simul_shortest_paths <- function (x,mode="directed") {
 #' }
 #' 
 
-
-simul_average_path_length <- function (x,mode="directed", unconnected=FALSE, infinite=NULL) {
+simul_eccentricity <- function (x,mode="directed", unconnected=FALSE, infinite=NULL) {
     S=simul_shortest_paths(x,mode=mode)
     if (class(infinite) != "NULL") {
         S[S==Inf]=infinite
     }
-    s=c(S[upper.tri(S)],S[lower.tri(S)])
-    if (unconnected) {
-        s=s[s!=Inf]
-    }
-    return(mean(s))
-        
+    vals=apply(S,1,function(x) { s=x; if (unconnected) { s=s[s!=Inf] }; return(1/max(s)) })
+    return(vals)
 }
+
+#' \name{simul_degree}
+#' \alias{simul_degree}
+#' \title{ Calculate the degree centrality for all nodes. }
+#' \usage{ simul_degree(x,mode="all") }
+#' \description{
+#'   This function calculates the number of edges connected to a
+#'   a node. For directed graph you can distinguish between in and outgoing nodes using the mode argument.
+#' }
+#' \arguments{
+#'   \item{x}{ adjacency matrix }
+#'   \item{mode}{ character string, either 'all' for 'in' and 'out' going edges or one of the latter, for undirected graphs the mode is always 'all', default: 'all' }
+#' }
+#' \value{ numeric vector with the number of connected edges }
+#' \examples{
+#' set.seed(124)
+#' res=simul_season(LETTERS[1:10])
+#' M=res$M
+#' M[M<0]=0
+#' M
+#' simul_degree(M)
+#' simul_degree(M,mode='in')
+#' simul_degree(M,mode='out')
+#' }
+#' 
+
+simul_degree <- function (x,mode="all") {
+    if (mode == "all" | all(x == t(x))) {
+        x=D2u(x)
+        return(apply(x,1,function (x) { return(length(which(x>0))) }))
+    } else if (mode == "in") {
+        return(apply(x,2,function(x) { return(length(which(x>0))) }))
+    } else if (mode == "out") {
+        return(apply(x,2,function(x) { return(length(which(x>0))) }))
+    } else {
+        stop("Wrong mode, mode must be either 'all', 'in' or 'out'!")
+    }
+}
+
 # private functions
 
 D2u <- function (g) {
@@ -920,3 +1043,15 @@ Components <- function (g) {
     return(comp[rownames(A)])
 }
 
+Simul_g2w <- function (x) {
+    x[x<0]=1
+    u=D2u(x)
+    degrees = apply(u,1,function(x) { return(length(which(x!= 0))) })
+    w=u/degrees
+    for (i in 1:(nrow(w)-1)) {
+        for (j in i:nrow(w)) {
+            w[i,j]=w[j,i]=min(w[i,j],w[j,i])
+        }
+    }
+    return(w)
+}
