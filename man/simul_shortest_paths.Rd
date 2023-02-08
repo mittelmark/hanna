@@ -1,7 +1,7 @@
 \name{simul_shortest_paths} 
 \alias{simul_shortest_paths} 
 \title{ Calculate the shortest path between all nodes. } 
-\usage{ simul_shortest_paths(x,mode="directed") } 
+\usage{ simul_shortest_paths(x,mode="directed",weighted=FALSE,FUN=mean) } 
 \description{ 
   This function calculates the shortest path between all pair of nodes. 
    In unconnected graphs it returns Inf, if the connected option is set to TRUE 
@@ -12,6 +12,8 @@
 \arguments{ 
   \item{x}{ adjacency matrix } 
   \item{mode}{ should be either "directed" or "undirected", default: "directed"} 
+  \item{weighted}{ should be taken as weighted graph, default: FALSE} 
+  \item{FUN}{for directed graphs with multiedges how to compute the entry in undirected graphs} 
 } 
 \value{ matrix with the pairwise path lengths } 
 \examples{ 

@@ -19,7 +19,7 @@
 } 
  
 \examples{ 
-set.seed(123) 
+set.seed(124) 
 res=simul_season(LETTERS[1:6],model="null")  
 res 
 simul_plot(res$M) 

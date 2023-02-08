@@ -19,7 +19,7 @@
 #' }
 #'
 #' \examples{
-#' set.seed(123)
+#' set.seed(124)
 #' res=simul_season(LETTERS[1:6],model="null") 
 #' res
 #' simul_plot(res$M)
@@ -207,7 +207,6 @@ Simul_season2 <- function (x,memory=NULL,
     names(token)=nms
     if (class(memory) != "NULL") {
         token=token+unlist(lapply(memory,sum))
-        print(token)
     } else {
         memory=lapply(x,function(x) { return(rep(0,memory.length+1)) })
         names(memory)=nms
@@ -461,8 +460,9 @@ simul_layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interactiv
         mode="circle"
     }
     if (mode %in% c('mds','sam')) {
+        A[A==-1]=0
         A=Connect(A)
-        sp=simul_shortest_paths(A)
+        sp=simul_shortest_paths(A,mode="undirected")
         xy=cmdscale(sp)
         rownames(xy)=rownames(A)
         if (mode=='mds') {
@@ -655,7 +655,8 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
             pl=simul_average_path_length(A,mode="undirected",infinite=agents)
             plengths=c(plengths,pl)
             W=Simul_g2w(A)
-            wl=igraph::shortest.paths(igraph::graph.adjacency(W,weighted=TRUE,mode="undirected"))
+            wl=simul_shortest_paths(W,mode="undirected")
+            wl[wl==Inf]=2*max(wl[wl!=Inf])
             wl=mean(wl[upper.tri(wl)])
             wlengths=c(wlengths,wl)
             res.df=rbind(res.df,t(as.data.frame(unlist(simul_triads(simul_graph(res$M,mode="win"))))))
@@ -673,7 +674,8 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
             pl=simul_average_path_length(A,mode="undirected",infinite=agents)
             plengths=c(plengths,pl)
             W=Simul_g2w(A)
-            wl=igraph::shortest.paths(igraph::graph.adjacency(W,weighted=TRUE,mode="undirected"))
+            wl=simul_shortest_paths(W,mode="undirected")
+            wl[wl==Inf]=2*max(wl[wl!=Inf])
             wl=mean(wl[upper.tri(wl)])
             wlengths=c(wlengths,wl)
             res.df=rbind(res.df,t(as.data.frame(unlist(simul_triads(simul_graph(res$M,mode="win"))))))
@@ -762,7 +764,7 @@ simul_triads <- function (x,percent=FALSE) {
 #' \name{simul_shortest_paths}
 #' \alias{simul_shortest_paths}
 #' \title{ Calculate the shortest path between all nodes. }
-#' \usage{ simul_shortest_paths(x,mode="directed") }
+#' \usage{ simul_shortest_paths(x,mode="directed",weighted=FALSE,FUN=mean) }
 #' \description{
 #'   This function calculates the shortest path between all pair of nodes.
 #'    In unconnected graphs it returns Inf, if the connected option is set to TRUE
@@ -773,6 +775,8 @@ simul_triads <- function (x,percent=FALSE) {
 #' \arguments{
 #'   \item{x}{ adjacency matrix }
 #'   \item{mode}{ should be either "directed" or "undirected", default: "directed"}
+#'   \item{weighted}{ should be taken as weighted graph, default: FALSE}
+#'   \item{FUN}{for directed graphs with multiedges how to compute the entry in undirected graphs}
 #' }
 #' \value{ matrix with the pairwise path lengths }
 #' \examples{
@@ -784,88 +788,38 @@ simul_triads <- function (x,percent=FALSE) {
 #' simul_shortest_paths(M,mode="undirected")
 #' }
 
-simul_shortest_paths <- function (x,mode="directed") {
+simul_shortest_paths <- function (x,mode="directed",weighted=FALSE,FUN=mean) {
     g=x
     A=g
-    if (mode == "undirected") {
-        A=A+t(A)
-        A[A!=0]=1
-    }
-    S=A
-    S[]=Inf
-    diag(S)=0
-    x=1
-    S[A > 0 & A < Inf]=1
-    while (TRUE) { 
-        flag = FALSE 
-        for (m in 1:nrow(S)) {
-            ns=which(S[m,] == x)
-            for (n in ns) {
-                for (o in which(A[n,]==1)) {
-                    if (o != m) {
-                        flag = TRUE
-                        if (S[m,o] > x + 1) {
-                            S[m,o]=x+1
-                            if (mode == "undirected") {
-                                S[o,m]=x+1
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (!flag) {
-            break
-        }
-        x=x+1
-    }
-    return(S)
-}
-
-Simul_shortest_paths <- function (x,mode="directed",FUNC=max) {
-    g=x
-    A=g
-    if (mode == "undirected") {
-        #A=A+t(A)
-        #A[A!=0]=1
+    A[A==-1]=0
+    if (mode == "undirected" & !weighted) {
+        U=D2u(A)
+    } else if (mode == "undirected") {
         for (i in 1:(nrow(A)-1)) {
             for (j in i:nrow(A)) {
-                A[i,j]=A[j,i]=FUNC(A[i,j],A[j,i])
+                A[i,j]=A[j,i]=FUN(A[i,j],A[j,i])
             }
         }
-
     }
-    S=A
-    S[S==0]=Inf
-    diag(S)=0
-    x=0
-    #S[A > 0 & A < Inf]=1
-    while (TRUE) { 
-        flag = FALSE 
-        for (m in 1:nrow(S)) {
-            ns=which(S[m,] > 0)
-            for (n in ns) {
-                for (o in which(A[n,]>0)) {
-                    if (o != m) {
-                        flag = TRUE
-                        if (S[m,o] > x + 1) {
-                            S[m,o]=x+1
-                            if (mode == "undirected") {
-                                S[o,m]=x+1
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (!flag) {
-            break
-        }
-        x=x+1
-    }
+    S=ShortestPath_FloydWarshall(A) 
     return(S)
 }
 
+ShortestPath_FloydWarshall <- function (A) {
+    U=A
+    A[A==0]=Inf
+    diag(A)=0
+    for (k in 1:nrow(A)) {
+        for (i in 1:nrow(A)) {
+            for (j in 1:nrow(A)) {
+                if (A[i,k] + A[k,j] < A[i,j]) {
+                    A[i,j] = A[i,k] + A[k,j]
+                }
+            }
+        }
+    }
+    return(A)
+}
 #' \name{simul_average_path_length}
 #' \alias{simul_average_path_length}
 #' \title{ Calculate the average path length between all nodes. }
