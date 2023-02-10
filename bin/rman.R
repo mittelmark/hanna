@@ -10,7 +10,7 @@ for (file in args) {
     flag = FALSE
     while(length((line = readLines(fin,n=1)))>0) {
         if (grepl("^#' *\\\\name\\{.+\\}",line)) {
-                  name = gsub("^#' *\\\\name\\{(.+)\\}.*","\\1",line)      
+                  name = gsub("\\$","_",gsub("^#' *\\\\name\\{(.+)\\}.*","\\1",line))
                               print(paste("name = '",name,"'",sep=''))
             flag = TRUE
             mandir = sub("R/.+","man/",file)
