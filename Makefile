@@ -3,7 +3,7 @@ PKG     := $(shell basename `pwd`)
 build:
 	R CMD build .
 
-check: build man/add.Rd man/simul.Rd
+check: build man/add.Rd man/simul.Rd man/hgraph.Rd
 	R CMD check $(PKG)_$(VERSION).tar.gz
 
 man/%.Rd: R/%.R

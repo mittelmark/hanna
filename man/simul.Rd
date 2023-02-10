@@ -5,16 +5,10 @@
   The function with the simul prefix perform simulations of winner-looser effects for the paper ... 
   The following functions are implemented: 
   \itemize{ 
-     \item \code{\link{simul_average_path_length}} - calucate the average path length for a given adjacency matrix 
-     \item \code{\link{simul_colors}} - create a color vector based on node degrees  
      \item \code{\link{simul_compare}} - compare the different models for a certain number of seasons 
      \item \code{\link{simul_graph}} - create a adjacency matrix out of the results for a match season 
-     \item \code{\link{simul_layout}} - calculate a plot layout for an adjacency matrix 
      \item \code{\link{simul_pairings}} - create round pairings for a season 
-     \item \code{\link{simul_plot}} - plot an adjacency matrix  
      \item \code{\link{simul_season}} - create matches for everyone against everyone using the given model 
-     \item \code{\link{simul_shortest_paths}} - caluclate the shortest paths between all nodes of an adjacency matrix  
-     \item \code{\link{simul_triads}} - alculate the number of two and tri edge triads 
    } 
 } 
  
@@ -22,5 +16,5 @@
 set.seed(124) 
 res=simul_season(LETTERS[1:6],model="null")  
 res 
-simul_plot(res$M) 
+hgraph$plot(res$M) 
 } 
