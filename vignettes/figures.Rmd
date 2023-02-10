@@ -9,6 +9,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+<center>[hgraph module](hgraph.html) - [paper figures](figures.html)</center>
+
 ## Introduction
 
 Below you find the code for the paper ...

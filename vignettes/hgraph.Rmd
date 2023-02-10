@@ -9,6 +9,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+<center>[hgraph module](hgraph.html) - [paper figures](figures.html)</center>
+
 ## Introduction
 
 The `hgraph` module offers a few functions to deal with adjacency matrices
