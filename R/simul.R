@@ -333,7 +333,7 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
             A=res$M
             A[A<0]=0
             A=hgraph$.D2u(A)
-            pl=hgraph$average_path_length(A,mode="undirected",infinite=agents)
+            pl=hgraph$average_path_length(A,mode="undirected")
             plengths=c(plengths,pl)
             W=Simul_g2w(A)
             wl=hgraph$shortest_paths(W,mode="undirected")
@@ -352,7 +352,11 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
             A=res$M
             A[A<0]=0
             A=hgraph$.D2u(A)
-            pl=hgraph$average_path_length(A,mode="undirected",infinite=agents)
+            pl=hgraph$average_path_length(A,mode="undirected")
+            if (pl==Inf) {
+                pl=NA
+                #wl[wl==Inf]=2*max(wl[wl!=Inf])
+            } 
             plengths=c(plengths,pl)
             W=Simul_g2w(A)
             wl=hgraph$shortest_paths(W,mode="undirected")
