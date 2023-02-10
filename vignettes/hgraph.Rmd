@@ -1,0 +1,44 @@
+---
+title: "Short introduction into the hgraph module"
+author: Detlef Groth
+date: 2023-02-09
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{hgraph introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+The `hgraph` module offers a few functions to deal with adjacency matrices
+which are for instance created from the `simul` module. This module is a
+simple R environment and can be inspected therefor using the `ls` function.
+  
+
+```{r}
+library(hanna)  
+ls(hgraph)
+```
+
+There are as well a few private functions which should not be used directly be the programmer.
+
+```{r}
+ls(hgraph,all=TRUE)
+```
+
+These private functions are starting with a dot at the beginning.
+
+## Creating an example  graph 
+
+```{r fig.width=9,fig.height=6}
+W=hgraph$new()
+cols=hgraph$colors(W)
+hgraph$plot(W,vertex.color=cols)
+```
+  
+
+## EOF
+
+
+

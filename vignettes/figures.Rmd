@@ -4,7 +4,7 @@ author: Detlef Groth
 date: 2023-02-05
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Hermanussen et. al. figures}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -46,17 +46,19 @@ Now a directed graph where an edge is drawn from the winning team to the loosing
 D = simul_graph(res$M,mode='win')
 D
 par(mfrow=c(1,2),mai=rep(0.2,4))
-simul_plot(D,vertex.color=simul_colors(D))
-simul_plot(U)
+hgraph$plot(D,vertex.color=hgraph$colors(D))
+hgraph$plot(U)
 ```
 
 ## Model comparison
 
-```{r fig.width=14,fig.height=18,out.width=900}
-par(mfrow=c(5,4),mai=c(0.0,0.5,0.5,0.0))
+```{r fig.width=14,fig.height=18,out.width=900,eval=FALSE}
+pdf("~/Downloads/2023-02/networks.pdf",width=14,height=14)
+set.seed(123)
+par(mfrow=c(4,4),mai=c(0.0,0.5,0.5,0.0))
 colors=c('grey80','#ff9999','#bb5555')
 n=12
-for (mode in c('null','memory1','memory5','gain','keystone')) {
+for (mode in c('null','memory5','gain','keystone')) {
     for (i in 1:30) {
         if (i == 1) {
             if (mode == "keystone") {
@@ -83,7 +85,7 @@ for (mode in c('null','memory1','memory5','gain','keystone')) {
             simul_plot(D,vertex.color=cols,vertex.size=0.8)
             if (i == 1) {
                 if (mode == "gain") {
-                   mtext("winlo",side=2,cex=1.5,line=0)
+                   mtext("winlose",side=2,cex=1.5,line=0)
                 } else {
                     mtext(mode,side=2,cex=1.5,line=0)
                 }   
@@ -95,16 +97,18 @@ for (mode in c('null','memory1','memory5','gain','keystone')) {
         }
     }   
 }
+dev.off()
 ```
 
 ## Triad counting
 
-```{r fig.width=14,fig.height=14,out.width=1000}
+```{r fig.width=14,fig.height=14,out.width=1000,eval=FALSE}
 set.seed(128) 
-par(mfcol=c(5,4),omi=c(0.5,0.7,0.5,0.3),mai=rep(0.2,4))  
+pdf("~/Downloads/2023-02/triads.pdf",width=14,height=14)
+par(mfcol=c(4,4),omi=c(0.5,0.7,0.5,0.3),mai=rep(0.2,4))  
 for (i in c(1,5,10,30)) {
     res.df=simul_compare(n=10,seasons=i) 
-    for (mod in c("null","memory1", "memory5","gain","keystone")) {  
+    for (mod in c("null", "memory5","gain","keystone")) {  
        #rest=t(scale(t(res.df[res.df$model==mod,1:5]))) 
        rest=t(apply(res.df[res.df$model==mod,1:5],1,function(x) { (x/sum(x))*100} ))
        #rest=cbind(rest,res.df[,6])
@@ -112,7 +116,7 @@ for (i in c(1,5,10,30)) {
        lines(1:5,apply(rest,2,median)) 
        if (i == 1) {
           if (mod == "gain") {
-            mtext("winlo",side=2,cex=1.5,line=3)
+            mtext("winlose",side=2,cex=1.5,line=3)
           } else {
             mtext(mod,side=2,cex=1.5,line=3)
           }
@@ -135,16 +139,16 @@ for (i in c(1,5,10,30)) {
         }
     } 
 }
-
+dev.off()
 ```
 
 ## Measure sd and mean for the average path lengths
 
-```{r}
-agg1=with(res.all,aggregate(pls, by=list(model,iter), mean))
-agg2=with(res.all,aggregate(pls, by=list(model,iter), sd))
-agg3=with(res.all,aggregate(wls, by=list(model,iter), mean))
-agg4=with(res.all,aggregate(wls, by=list(model,iter), sd))
+```{r eval=FALSE}
+agg1=with(res.all,aggregate(pls, by=list(model,iter), mean,na.rm=TRUE))
+agg2=with(res.all,aggregate(pls, by=list(model,iter), sd,na.rm=TRUE))
+agg3=with(res.all,aggregate(wls, by=list(model,iter), mean,na.rm=TRUE))
+agg4=with(res.all,aggregate(wls, by=list(model,iter), sd,na.rm=TRUE))
 head(agg1,n=20)
 head(agg2,n=20)
 agg=cbind(agg1,agg2$x,agg3$x,agg4$x)
@@ -153,9 +157,10 @@ head(agg)
 ```
 
 
-```{r}
+```{r eval=FALSE}
 library(knitr)
 knitr::kable(agg)
+write.table(agg,file="~/Downloads/2023-02/path-lengths.tab",sep="\t",quote=FALSE)
 ```
 ## EOF
 
