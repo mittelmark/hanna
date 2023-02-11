@@ -39,14 +39,13 @@ hgraph=new.env()
 #' \alias{hgraph$eccentricity}
 #' \alias{hgraph_eccentricity}
 #' \title{ Calculate the eccentricity centrality for all nodes. }
+#' \usage{`hgraph$eccentricity(x,mode="directed",unconnected=FALSE,infinite=NULL)`}
 #' \description{
 #'   This function calculates the inverse of the longest shortest path for each node.
 #'    In unconnected graphs it returns Inf, if the connected option is set to TRUE
 #'    it returns the value between connected nodes only, you can as well
 #'    give a value which should be added instead of Inf values using the infinite argument, usually this is
 #'    the number of nodes.
-#' 
-#'    hgraph$eccentricity(x,mode="directed",unconnected=FALSE,infinite=NULL) 
 #' }
 #' \arguments{
 #'   \item{x}{ adjacency matrix }
@@ -79,11 +78,13 @@ hgraph$eccentricity <- function (x,mode="directed", unconnected=FALSE, infinite=
 #' \title{ Create a few example graphs. }
 #' \description{
 #'   This function creates a new graph su7ch as kite or werner graphs.
-#' 
+#'
 #'   hgraph$new(type="werner",nodes=10,edges=15)
 #' }
 #' \arguments{
-#'   \item{type}{ the graph type, either 'werner' or 'kite', default: 'werner' }
+#'   \item{type}{ eithern a adjacency matrix or a graph type, either 'werner' or 'kite', default: 'werner' }
+#'   \item{nodes}{for a random graph the number of edges, default: 10}
+#'   \item{edges}{number of edges in the graph, default: 15}
 #' }
 #' \value{ adjacency matrix }
 #' \examples{
@@ -93,7 +94,12 @@ hgraph$eccentricity <- function (x,mode="directed", unconnected=FALSE, infinite=
 #' 
 
 hgraph$new <- function (type="werner",nodes=10,edges=15) {
-    if (type == "werner") {
+    if (is.matrix(type)) {
+        if (is.null(rownames(type)[1])) {
+            rownames(type)=colnames(type)=LETTERS[1:ncol(type)]
+            A= type
+        }
+    } else if (type == "werner") {
         A=matrix(c(0,0,1,0,0,0,
                    0,0,1,0,0,0,
                    0,0,0,1,0,0,
@@ -126,6 +132,7 @@ hgraph$new <- function (type="werner",nodes=10,edges=15) {
     }  else {
         stop("Only kite, random and werner graphs are currently supported!")
     }
+    class(A)=c("hgraph","matrix")
     return(A)
 }
 
@@ -133,15 +140,13 @@ hgraph$new <- function (type="werner",nodes=10,edges=15) {
 #' \alias{hgraph$shortest_paths}
 #' \alias{hgraph_shortest_paths}
 #' \title{ Calculate the shortest path between all nodes of a graph. }
-#' 
+#' \usage{`hgraph$shortest_paths(x,mode="directed",weighted=FALSE,FUN=mean)`}
 #' \description{
 #'   This function calculates the shortest path between all pair of nodes.
 #'    In unconnected graphs it returns Inf, if the connected option is set to TRUE
 #'    it returns the average path length for the connected nodes, you can as well
 #'    give a value which should be added instead of Inf values, usually this is
 #'    the number of nodes.
-#' 
-#'   hgraph$shortest_paths(x,mode="directed",weighted=FALSE,FUN=mean) 
 #' }
 #' \arguments{
 #'   \item{x}{ adjacency matrix }
@@ -158,7 +163,6 @@ hgraph$new <- function (type="werner",nodes=10,edges=15) {
 #' A
 #' hgraph$shortest_paths(A,mode="undirected")
 #' }
-
 
 hgraph$shortest_paths <- function (x,mode="directed",weighted=FALSE,FUN=mean) {
     g=x
@@ -197,14 +201,13 @@ ShortestPath_FloydWarshall <- function (A) {
 #' \alias{hgraph$average_path_length}
 #' \alias{hgraph_average_path_length}
 #' \title{Calculate the average path length between all nodes of a graph. }
+#' \usage{`hgraph$average_path_length(x,mode="directed",unconnected=FALSE,infinite=NULL)`}
 #' \description{
 #'   This function calculates the average shortest path length between all pair of nodes.
 #'    In unconnected graphs it returns Inf, if the connected option is set to TRUE
 #'    it returns the average path length for the connected nodes, you can as well
 #'    give a value which should be added instead of Inf values, usually this is
 #'    the number of nodes.
-#' 
-#'    hgraph$average_path_length(x,mode="directed",unconnected=FALSE,infinite=NULL)
 #' }
 #' \arguments{
 #'   \item{x}{ adjacency matrix }
@@ -236,13 +239,12 @@ hgraph$average_path_length <- function (x,mode="directed", unconnected=FALSE, in
 #' \alias{hgraph$colors}
 #' \alias{hgraph_colors}
 #' \title{ create a color vector based on node degrees }
+#' \usage{`hgraph$colors(x,col=c('skyblue','grey80','salmon'))`}
 #' \description{
 #'   This function creates three colors based on the in- and out-degrees of
 #'   for the nodes of the given adjacency matrix. nodes with only incoming nodes degrees get the first color,
 #'   nodes with in and out going edges ge the second color and nodes with
 #'   only outgoing edges the third color.
-#' 
-#'   hgraph$colors(x,col=c('skyblue','grey80','salmon'))
 #' }
 #' \arguments{
 #'   \item{x}{ adjacency matrix }
@@ -272,11 +274,10 @@ hgraph$colors <- function (x,col=c('skyblue','grey80','salmon')) {
 #' \alias{hgraph_degree}
 #' \alias{hgraph$degree}
 #' \title{ Calculate the degree centrality for all nodes. }
+#'  \usage{`hgraph$degree(x,mode="all")`}
 #' \description{
 #'   This function calculates the number of edges connected to a
 #'   a node. For directed graph you can distinguish between in and outgoing nodes using the mode argument.
-#'  
-#'  hgraph$degree(x,mode="all") 
 #' }
 #' \arguments{
 #'   \item{x}{ adjacency matrix }
@@ -308,11 +309,10 @@ hgraph$degree <- function (x,mode="all") {
 #' \name{hgraph$triads}
 #' \alias{hgraph$triads}
 #' \title{ Calculate the number of two and tri edge triads. }
+#' \usage{`hgraph$triads(x,percent=FALSE)`}
 #' \description{
 #'   This function calculates the number of two and tri edge triads for
 #'   directed graphs. 
-#' 
-#'   hgraph$triads(x,percent=FALSE) 
 #'  
 #'   The following triads are possible:
 #'   \itemize{
@@ -386,10 +386,9 @@ hgraph$triads <- function (x,percent=FALSE) {
 #' \alias{hgraph$layout}
 #' \alias{hgraph_layout}
 #' \title{calculate a plot layout for an adjacency matrix }
+#' \usage{`hgraph$layout(x,mode='sam', noise=FALSE, star.center=NULL, interactive=FALSE)`}
 #' \description{
 #'   This function is used to create a layout for a given graph.
-#' 
-#'   hgraph$layout(x,mode='sam', noise=FALSE, star.center=NULL, interactive=FALSE)
 #'  
 #'   There are a few algorithms available such as MDS based ones like 'mds' or 'sam'
 #'   and circular layouts like 'circle' or 'star', furthermore there is 
@@ -535,16 +534,19 @@ hgraph$layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interacti
 #' \name{hgraph$plot}
 #' \alias{hgraph$plot}
 #' \alias{hgraph_plot}
+#' \alias{plot.hgraph}
 #' \title{ plot an adjacency matrix }
+#' \usage{`hgraph$plot(x, layout='sam',
+#'          vertex.size=1, vertex.labels=NULL, vertex.color="grey80",
+#'          vertex.cex=1, vertex.pch=19,
+#'          edge.color="grey40", edge.lty=1, edge.text=NULL, edge.cex=1,
+#'          edge.pch=0, edge.lwd=3,weighted=FALSE,
+#'          star.center=NULL,...)`
+#' }
 #' \description{
 #'   This function plots an adjacency matrix representing an undirected or
 #'   directed graph using different layout mechanisms.
 #' 
-#'   hgraph$plot(x,layout='sam',
-#'          vertex.size=1,vertex.labels=NULL,vertex.color="grey80",vertex.cex=1,vertex.pch=19,
-#'          edge.color="grey40",edge.lty=1,edge.text=NULL,edge.cex=1,edge.pch=0,
-#'          edge.lwd=3,weighted=FALSE,
-#'          star.center=NULL,...)
 #' }
 #' \arguments{
 #'   \item{x}{ an adjacency matrix }
@@ -662,6 +664,7 @@ hgraph$plot = function (x,layout='sam',
     text(layout,rownames(A),cex=vertex.cex)
 }
 
+plot.hgraph=hgraph$plot
 
 # private functions
 

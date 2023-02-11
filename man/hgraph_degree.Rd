@@ -2,11 +2,10 @@
 \alias{hgraph_degree} 
 \alias{hgraph$degree} 
 \title{ Calculate the degree centrality for all nodes. } 
+ \usage{`hgraph$degree(x,mode="all")`} 
 \description{ 
   This function calculates the number of edges connected to a 
   a node. For directed graph you can distinguish between in and outgoing nodes using the mode argument. 
-  
- hgraph$degree(x,mode="all")  
 } 
 \arguments{ 
   \item{x}{ adjacency matrix } 

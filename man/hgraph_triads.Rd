@@ -1,11 +1,10 @@
 \name{hgraph$triads} 
 \alias{hgraph$triads} 
 \title{ Calculate the number of two and tri edge triads. } 
+\usage{`hgraph$triads(x,percent=FALSE)`} 
 \description{ 
   This function calculates the number of two and tri edge triads for 
   directed graphs.  
- 
-  hgraph$triads(x,percent=FALSE)  
   
   The following triads are possible: 
   \itemize{ 

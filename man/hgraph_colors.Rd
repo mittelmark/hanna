@@ -2,13 +2,12 @@
 \alias{hgraph$colors} 
 \alias{hgraph_colors} 
 \title{ create a color vector based on node degrees } 
+\usage{`hgraph$colors(x,col=c('skyblue','grey80','salmon'))`} 
 \description{ 
   This function creates three colors based on the in- and out-degrees of 
   for the nodes of the given adjacency matrix. nodes with only incoming nodes degrees get the first color, 
   nodes with in and out going edges ge the second color and nodes with 
   only outgoing edges the third color. 
- 
-  hgraph$colors(x,col=c('skyblue','grey80','salmon')) 
 } 
 \arguments{ 
   \item{x}{ adjacency matrix } 

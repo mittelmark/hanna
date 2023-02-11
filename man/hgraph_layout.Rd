@@ -2,10 +2,9 @@
 \alias{hgraph$layout} 
 \alias{hgraph_layout} 
 \title{calculate a plot layout for an adjacency matrix } 
+\usage{`hgraph$layout(x,mode='sam', noise=FALSE, star.center=NULL, interactive=FALSE)`} 
 \description{ 
   This function is used to create a layout for a given graph. 
- 
-  hgraph$layout(x,mode='sam', noise=FALSE, star.center=NULL, interactive=FALSE) 
   
   There are a few algorithms available such as MDS based ones like 'mds' or 'sam' 
   and circular layouts like 'circle' or 'star', furthermore there is  

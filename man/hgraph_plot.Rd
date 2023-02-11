@@ -1,16 +1,19 @@
 \name{hgraph$plot} 
 \alias{hgraph$plot} 
 \alias{hgraph_plot} 
+\alias{plot.hgraph} 
 \title{ plot an adjacency matrix } 
+\usage{`hgraph$plot(x, layout='sam', 
+         vertex.size=1, vertex.labels=NULL, vertex.color="grey80", 
+         vertex.cex=1, vertex.pch=19, 
+         edge.color="grey40", edge.lty=1, edge.text=NULL, edge.cex=1, 
+         edge.pch=0, edge.lwd=3,weighted=FALSE, 
+         star.center=NULL,...)` 
+} 
 \description{ 
   This function plots an adjacency matrix representing an undirected or 
   directed graph using different layout mechanisms. 
  
-  hgraph$plot(x,layout='sam', 
-         vertex.size=1,vertex.labels=NULL,vertex.color="grey80",vertex.cex=1,vertex.pch=19, 
-         edge.color="grey40",edge.lty=1,edge.text=NULL,edge.cex=1,edge.pch=0, 
-         edge.lwd=3,weighted=FALSE, 
-         star.center=NULL,...) 
 } 
 \arguments{ 
   \item{x}{ an adjacency matrix } 

@@ -2,14 +2,13 @@
 \alias{hgraph$eccentricity} 
 \alias{hgraph_eccentricity} 
 \title{ Calculate the eccentricity centrality for all nodes. } 
+\usage{`hgraph$eccentricity(x,mode="directed",unconnected=FALSE,infinite=NULL)`} 
 \description{ 
   This function calculates the inverse of the longest shortest path for each node. 
    In unconnected graphs it returns Inf, if the connected option is set to TRUE 
    it returns the value between connected nodes only, you can as well 
    give a value which should be added instead of Inf values using the infinite argument, usually this is 
    the number of nodes. 
- 
-   hgraph$eccentricity(x,mode="directed",unconnected=FALSE,infinite=NULL)  
 } 
 \arguments{ 
   \item{x}{ adjacency matrix } 

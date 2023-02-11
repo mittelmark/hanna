@@ -2,15 +2,13 @@
 \alias{hgraph$shortest_paths} 
 \alias{hgraph_shortest_paths} 
 \title{ Calculate the shortest path between all nodes of a graph. } 
- 
+\usage{`hgraph$shortest_paths(x,mode="directed",weighted=FALSE,FUN=mean)`} 
 \description{ 
   This function calculates the shortest path between all pair of nodes. 
    In unconnected graphs it returns Inf, if the connected option is set to TRUE 
    it returns the average path length for the connected nodes, you can as well 
    give a value which should be added instead of Inf values, usually this is 
    the number of nodes. 
- 
-  hgraph$shortest_paths(x,mode="directed",weighted=FALSE,FUN=mean)  
 } 
 \arguments{ 
   \item{x}{ adjacency matrix } 

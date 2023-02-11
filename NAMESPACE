@@ -1,4 +1,5 @@
 exportPattern("^[[:lower:]]+")
+S3method(plot,hgraph)
 importFrom("graphics", "arrows", "axTicks", "lines", "locator",        
              "points", "text")                                           
 importFrom("stats", "cmdscale", "dist", "rnorm")    
