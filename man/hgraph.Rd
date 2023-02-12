@@ -1,19 +1,20 @@
 \name{hgraph}  
 \alias{hgraph}  
-\title{ Environment with utility functions to work with graphs.} 
+\alias{hgraph-class} 
+\title{ Class with utility functions to work with graphs.} 
 \description{  
-  The functions of this envirornment contain a few utility functions to work with graphs 
+  The functions of this environment contain a few utility functions to work with graphs 
   represented as adjacency matrix. 
 } 
-\details{ 
+\section{Methods}{ 
    The following functions are implemented: 
    \itemize{ 
       \item \code{\link{hgraph$average_path_length}} - calculate the average path length for a given adjacency matrix 
       \item \code{\link{hgraph$colors}} - create a color vector based on node degrees  
       \item \code{\link{hgraph$degree}} - calculate the degree centrality for all nodes 
       \item \code{\link{hgraph$eccentricity}} - calculate eccentricity centrality for all nodes 
+      \item \code{\link{hgraph$graph}} - create some example graphs 
       \item \code{\link{hgraph$layout}} - calculate a plot layout for an adjacency matrix 
-      \item \code{\link{hgraph$new}} - create some example graphs 
       \item \code{\link{hgraph$plot}} - plot an adjacency matrix  
       \item \code{\link{hgraph$shortest_paths}} - calculate the shortest paths between all nodes of an adjacency matrix  
       \item \code{\link{hgraph$triads}} - calculate the number of two and tri edge triads 

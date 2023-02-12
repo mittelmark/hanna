@@ -16,9 +16,8 @@
 \value{ vector of colors with length of node numner } 
 \examples{ 
 set.seed(124) 
-R=hgraph$new(type="random") 
+R=hgraph$graph(type="random") 
 cols=hgraph$colors(R) 
 hgraph$plot(R,vertex.color=cols) 
 } 
-\seealso{ \code{\link{testprint}} } 
  

@@ -20,7 +20,7 @@
   \item{interactive}{should be there an interactive clicking to mode the nodes in the layout, default: FALSE} 
 } 
 \examples{ 
-A=hgraph$new() 
+A=hgraph$graph() 
 lay=hgraph$layout(A) 
 plot(lay, pch=19,col="salmon",cex=5,xlab="",ylab="",axes=FALSE) 
 text(lay,rownames(A)) 

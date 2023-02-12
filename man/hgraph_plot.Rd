@@ -1,8 +1,8 @@
 \name{hgraph$plot} 
 \alias{hgraph$plot} 
 \alias{hgraph_plot} 
-\alias{plot.hgraph} 
-\title{ plot an adjacency matrix } 
+\alias{plot.graph} 
+\title{ plot an adjacency matrix representing a graph } 
 \usage{`hgraph$plot(x, layout='sam', 
          vertex.size=1, vertex.labels=NULL, vertex.color="grey80", 
          vertex.cex=1, vertex.pch=19, 
@@ -34,7 +34,7 @@
   \item{\ldots}{arguments delegated to the plot function} 
 } 
 \examples{ 
-A=hgraph$new() 
+A=hgraph$graph() 
 col=hgraph$colors(A) 
 hgraph$plot(A,vertex.color=col) 
 } 

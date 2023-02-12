@@ -1,19 +1,21 @@
+#' \docType{class}
 #' \name{hgraph} 
 #' \alias{hgraph} 
-#' \title{ Environment with utility functions to work with graphs.}
+#' \alias{hgraph-class}
+#' \title{ Class with utility functions to work with graphs.}
 #' \description{ 
-#'   The functions of this envirornment contain a few utility functions to work with graphs
+#'   The functions of this environment contain a few utility functions to work with graphs
 #'   represented as adjacency matrix.
 #' }
-#' \details{
+#' \section{Methods}{
 #'    The following functions are implemented:
 #'    \itemize{
 #'       \item \code{\link{hgraph$average_path_length}} - calculate the average path length for a given adjacency matrix
 #'       \item \code{\link{hgraph$colors}} - create a color vector based on node degrees 
 #'       \item \code{\link{hgraph$degree}} - calculate the degree centrality for all nodes
 #'       \item \code{\link{hgraph$eccentricity}} - calculate eccentricity centrality for all nodes
+#'       \item \code{\link{hgraph$graph}} - create some example graphs
 #'       \item \code{\link{hgraph$layout}} - calculate a plot layout for an adjacency matrix
-#'       \item \code{\link{hgraph$new}} - create some example graphs
 #'       \item \code{\link{hgraph$plot}} - plot an adjacency matrix 
 #'       \item \code{\link{hgraph$shortest_paths}} - calculate the shortest paths between all nodes of an adjacency matrix 
 #'       \item \code{\link{hgraph$triads}} - calculate the number of two and tri edge triads
@@ -56,7 +58,7 @@ hgraph=new.env()
 #' \value{ matrix with the pairwise path lengths }
 #' \examples{
 #' set.seed(123)
-#' A=hgraph$new()
+#' A=hgraph$graph()
 #' A
 #' hgraph$eccentricity(A)
 #' hgraph$eccentricity(A,mode="undireced")
@@ -64,7 +66,8 @@ hgraph=new.env()
 #' 
 
 hgraph$eccentricity <- function (x,mode="directed", unconnected=FALSE, infinite=NULL) {
-    S=hgraph$shortest_paths(x,mode=mode)
+    self=hgraph
+    S=self$shortest_paths(x,mode=mode)
     if (class(infinite) != "NULL") {
         S[S==Inf]=infinite
     }
@@ -72,14 +75,13 @@ hgraph$eccentricity <- function (x,mode="directed", unconnected=FALSE, infinite=
     return(vals)
 }
 
-#' \name{hgraph$new}
-#' \alias{hgraph$new}
-#' \alias{hgraph_new}
+#' \name{hgraph$graph}
+#' \alias{hgraph$graph}
+#' \alias{hgraph_graph}
 #' \title{ Create a few example graphs. }
+#' \usage{`hgraph$graph(type="werner",nodes=10,edges=15)`}
 #' \description{
-#'   This function creates a new graph su7ch as kite or werner graphs.
-#'
-#'   hgraph$new(type="werner",nodes=10,edges=15)
+#'   This function creates a new graph such as random, kite or werner graphs.
 #' }
 #' \arguments{
 #'   \item{type}{ eithern a adjacency matrix or a graph type, either 'werner' or 'kite', default: 'werner' }
@@ -88,12 +90,13 @@ hgraph$eccentricity <- function (x,mode="directed", unconnected=FALSE, infinite=
 #' }
 #' \value{ adjacency matrix }
 #' \examples{
-#' A = hgraph$new()
+#' A = hgraph$graph()
 #' A
 #' }
 #' 
 
-hgraph$new <- function (type="werner",nodes=10,edges=15) {
+hgraph$graph <- function (type="werner",nodes=10,edges=15) {
+    self=hgraph
     if (is.matrix(type)) {
         if (is.null(rownames(type)[1])) {
             rownames(type)=colnames(type)=LETTERS[1:ncol(type)]
@@ -132,7 +135,7 @@ hgraph$new <- function (type="werner",nodes=10,edges=15) {
     }  else {
         stop("Only kite, random and werner graphs are currently supported!")
     }
-    class(A)=c("hgraph","matrix")
+    class(A)=c("graph","matrix")
     return(A)
 }
 
@@ -165,11 +168,11 @@ hgraph$new <- function (type="werner",nodes=10,edges=15) {
 #' }
 
 hgraph$shortest_paths <- function (x,mode="directed",weighted=FALSE,FUN=mean) {
-    g=x
-    A=g
+    self=hgraph
+    A=x
     A[A==-1]=0
     if (mode == "undirected" & !weighted) {
-        U=hgraph$.D2u(A)
+        A=self$.D2u(A)
     } else if (mode == "undirected") {
         for (i in 1:(nrow(A)-1)) {
             for (j in i:nrow(A)) {
@@ -223,16 +226,16 @@ ShortestPath_FloydWarshall <- function (A) {
 #' 
 
 hgraph$average_path_length <- function (x,mode="directed", unconnected=FALSE, infinite=NULL) {
-     S=hgraph$shortest_paths(x,mode=mode)
-     if (class(infinite) != "NULL") {
-         S[S==Inf]=infinite
-     }
+    self=hgraph
+    S=self$shortest_paths(x,mode=mode)
+    if (class(infinite) != "NULL") {
+        S[S==Inf]=infinite
+    }
     s=c(S[upper.tri(S)],S[lower.tri(S)])
     if (unconnected) {
         s=s[s!=Inf]
     }
     return(mean(s))
-        
 }
 
 #' \name{hgraph$colors}
@@ -253,14 +256,14 @@ hgraph$average_path_length <- function (x,mode="directed", unconnected=FALSE, in
 #' \value{ vector of colors with length of node numner }
 #' \examples{
 #' set.seed(124)
-#' R=hgraph$new(type="random")
+#' R=hgraph$graph(type="random")
 #' cols=hgraph$colors(R)
 #' hgraph$plot(R,vertex.color=cols)
 #' }
-#' \seealso{ \code{\link{testprint}} }
 #'
 
 hgraph$colors <- function (x,col=c('skyblue','grey80','salmon')) {
+    self=hgraph
     out=apply(x,1,sum)
     ins=apply(x,2,sum)
     cols=rep(col[1],ncol(x))
@@ -286,7 +289,7 @@ hgraph$colors <- function (x,col=c('skyblue','grey80','salmon')) {
 #' \value{ numeric vector with the number of connected edges }
 #' \examples{
 #' set.seed(124)
-#' A=hgraph$new(type="werner")
+#' A=hgraph$graph(type="werner")
 #' hgraph$degree(A)
 #' hgraph$degree(A,mode='in')
 #' hgraph$degree(A,mode='out')
@@ -294,8 +297,9 @@ hgraph$colors <- function (x,col=c('skyblue','grey80','salmon')) {
 #' 
 
 hgraph$degree <- function (x,mode="all") {
+    self=hgraph
     if (mode == "all" | all(x == t(x))) {
-        x=hgraph$.D2u(x)
+        x=self$.D2u(x)
         return(apply(x,1,function (x) { return(length(which(x>0))) }))
     } else if (mode == "in") {
         return(apply(x,2,function(x) { return(length(which(x>0))) }))
@@ -346,6 +350,7 @@ hgraph$degree <- function (x,mode="all") {
 #' }
 
 hgraph$triads <- function (x,percent=FALSE) {
+    self=hgraph
     # count two and tri edge triads
     g=x
     g[g<0]=0
@@ -404,7 +409,7 @@ hgraph$triads <- function (x,percent=FALSE) {
 #'   \item{interactive}{should be there an interactive clicking to mode the nodes in the layout, default: FALSE}
 #' }
 #' \examples{
-#' A=hgraph$new()
+#' A=hgraph$graph()
 #' lay=hgraph$layout(A)
 #' plot(lay, pch=19,col="salmon",cex=5,xlab="",ylab="",axes=FALSE)
 #' text(lay,rownames(A))
@@ -412,17 +417,18 @@ hgraph$triads <- function (x,percent=FALSE) {
 #'
 
 hgraph$layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interactive=FALSE) {
+    self=hgraph
     A=x
     if (!identical(A,t(A))) {
-        A=hgraph$.D2u(A)
+        A=self$.D2u(A)
     }
     if (ncol(A)==3 & mode %in% c("sam","mds")) {
         mode="circle"
     }
     if (mode %in% c('mds','sam')) {
         A[A==-1]=0
-        A=hgraph$.Connect(A)
-        sp=hgraph$shortest_paths(A,mode="undirected")
+        A=self$.Connect(A)
+        sp=self$shortest_paths(A,mode="undirected")
         xy=cmdscale(sp)
         rownames(xy)=rownames(A)
         if (mode=='mds') {
@@ -498,7 +504,7 @@ hgraph$layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interacti
     }
     colnames(xy)=c("x","y")
     doPlot <- function (A,xy) {
-        plot(xy,type="n",axes=FALSE,xlab="",ylab="")
+        base::plot(xy,type="n",axes=FALSE,xlab="",ylab="")
         for (i in 1:(ncol(A)-1)) {
             for (j in i:ncol(A)) {
                 if (A[i,j]!=0 | A[j,i]!=0) {
@@ -534,8 +540,8 @@ hgraph$layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interacti
 #' \name{hgraph$plot}
 #' \alias{hgraph$plot}
 #' \alias{hgraph_plot}
-#' \alias{plot.hgraph}
-#' \title{ plot an adjacency matrix }
+#' \alias{plot.graph}
+#' \title{ plot an adjacency matrix representing a graph }
 #' \usage{`hgraph$plot(x, layout='sam',
 #'          vertex.size=1, vertex.labels=NULL, vertex.color="grey80",
 #'          vertex.cex=1, vertex.pch=19,
@@ -567,7 +573,7 @@ hgraph$layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interacti
 #'   \item{\ldots}{arguments delegated to the plot function}
 #' }
 #' \examples{
-#' A=hgraph$new()
+#' A=hgraph$graph()
 #' col=hgraph$colors(A)
 #' hgraph$plot(A,vertex.color=col)
 #' }
@@ -578,13 +584,14 @@ hgraph$plot = function (x,layout='sam',
                         edge.color="grey40",edge.lty=1,edge.text=NULL,edge.cex=1,edge.pch=0,
                         edge.lwd=3,weighted=FALSE,
                         star.center=NULL,...) {
+    self = hgraph
     A=x
     if (is.matrix(layout) | is.data.frame(layout)) {
         if (ncol(layout) != 2) {
             stop("If a layout matrix or data frame is given two columns are required!")
         }
     } else if (layout %in% c("sam","mds","circle","star")) {
-        layout=hgraph$layout(A,mode=layout,star.center=star.center)
+        layout=self$layout(A,mode=layout,star.center=star.center)
     } else {
         stop("Wrong layout. Either a two column matrix or one of 'sam','mds','circle' or 'star' must be given!")
     }
@@ -612,7 +619,7 @@ hgraph$plot = function (x,layout='sam',
     if (identical(A,t(A))) {
         g="undirected"
     }
-    plot(layout,xlim=xlim,ylim=ylim,axes=FALSE,xlab="",ylab="",...)
+    base::plot(layout,xlim=xlim,ylim=ylim,axes=FALSE,xlab="",ylab="",...)
     for (i in 1:nrow(A)) {
         idx=which(A[i,]!= 0)
         for (j in idx) {
@@ -664,7 +671,7 @@ hgraph$plot = function (x,layout='sam',
     text(layout,rownames(A),cex=vertex.cex)
 }
 
-plot.hgraph=hgraph$plot
+plot.graph=hgraph$plot
 
 # private functions
 
@@ -679,15 +686,16 @@ hgraph$.D2u <- function (g) {
 
 
 hgraph$.Connect = function (g) {
+    self=hgraph
     A=g
     A=as.matrix(A)
     A=A+t(A)
     A[A>0]=1
-    P=hgraph$shortest_paths(A)
+    P=self$shortest_paths(A)
     if (!any(P==Inf)) {
         return(A)
     }
-    comp=hgraph$.Components(A)
+    comp=self$.Components(A)
     nodes=c()
     tab=table(comp)
     for (n in names(tab)) {
@@ -711,12 +719,13 @@ hgraph$.Connect = function (g) {
 }
 
 hgraph$.Components <- function (g) {
+    self=hgraph
     A=g
     A=as.matrix(A)
     A=A+t(A)
     A[A>0]=1
     comp=c()
-    P=hgraph$shortest_paths(A)
+    P=self$shortest_paths(A)
     nodes=rownames(A)
     x=1
     while (length(nodes) > 0) {

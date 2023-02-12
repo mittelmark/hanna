@@ -14,7 +14,7 @@
 \value{ numeric vector with the number of connected edges } 
 \examples{ 
 set.seed(124) 
-A=hgraph$new(type="werner") 
+A=hgraph$graph(type="werner") 
 hgraph$degree(A) 
 hgraph$degree(A,mode='in') 
 hgraph$degree(A,mode='out') 

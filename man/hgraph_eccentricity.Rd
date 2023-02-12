@@ -19,7 +19,7 @@
 \value{ matrix with the pairwise path lengths } 
 \examples{ 
 set.seed(123) 
-A=hgraph$new() 
+A=hgraph$graph() 
 A 
 hgraph$eccentricity(A) 
 hgraph$eccentricity(A,mode="undireced") 
