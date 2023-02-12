@@ -11,3 +11,4 @@ Depends: MASS
 VignetteBuilder: knitr
 License: MIT + file LICENSE
 NeedsCompilation: no
+Collate: Emil.R hgraph.R simul.R
