@@ -1,20 +1,22 @@
 \name{simul}  
 \alias{simul}  
-\title{ Collection of functions which do winner-looser and network structure simulations. }  
+\alias{simul-class}  
+\title{ Environment obkject with functions do simulate winner-looser effects. }  
 \description{  
-  The function with the simul prefix perform simulations of winner-looser effects for the paper ... 
-  The following functions are implemented: 
+  The functions within the simul environment perform simulations of winner-looser effects for the paper ... 
+} 
+\section{Methods}{ 
   \itemize{ 
-     \item \code{\link{simul_compare}} - compare the different models for a certain number of seasons 
-     \item \code{\link{simul_graph}} - create a adjacency matrix out of the results for a match season 
-     \item \code{\link{simul_pairings}} - create round pairings for a season 
-     \item \code{\link{simul_season}} - create matches for everyone against everyone using the given model 
+     \item \code{\link[hanna:simul_compare]{simul$compare}} - compare the different models for a certain number of seasons 
+     \item \code{\link[hanna:simul_graph]{simul$graph}} - create a adjacency matrix out of the results for a match season 
+     \item \code{\link[hanna:simul_pairings]{simul$pairings}} - create round pairings for a season 
+     \item \code{\link[hanna:simul_season]{simul$season}} - create matches for everyone against everyone using the given model 
    } 
 } 
  
 \examples{ 
 set.seed(124) 
-res=simul_season(LETTERS[1:6],model="null")  
+res=simul$season(LETTERS[1:6],model="null")  
 res 
 hgraph$plot(res$M) 
 } 

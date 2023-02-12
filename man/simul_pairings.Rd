@@ -1,11 +1,12 @@
-\name{simul_pairings} 
+\name{simul$pairings} 
 \alias{simul_pairings} 
+\alias{simul$pairings} 
 \title{ Create matching pairs everyone against every one. } 
 \description{ 
   This function creates pairings for a tournament where in every round 
   item, teams, etc get new partners for playing. 
 } 
-\usage{ simul_pairings(x) } 
+\usage{ `simul$pairings(x)` } 
  
 \arguments{ 
   \item{x}{ symmetric matrix with row and colum names being the same, or a vector of names } 
@@ -17,7 +18,7 @@
 \examples{ 
 mt=matrix(0,nrow=4,ncol=4) 
 rownames(mt)=colnames(mt)=LETTERS[1:4] 
-simul_pairings(mt) 
-simul_pairings(c("ABA","CDE","EFG")) 
+simul$pairings(mt) 
+simul$pairings(c("ABA","CDE","EFG")) 
 } 
  

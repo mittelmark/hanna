@@ -1,11 +1,12 @@
-\name{simul_compare} 
+\name{simul$compare} 
+\alias{simul$compare} 
 \alias{simul_compare} 
 \title{ Compare the different models for a certain number of seasons. } 
 \description{ 
   This function does a comparison for different models determine 
   the amount of triads after a certain number of seasons. 
 } 
-\usage{ simul_compare(n=5,agents=12,seasons=3) } 
+\usage{ `simul$compare(n=5,agents=12,seasons=3)` } 
 \arguments{ 
   \item{n}{ how many repeats per model, default: 5} 
   \item{agents}{how many agents/teams, default: 12}  
@@ -16,7 +17,7 @@
 \examples{ 
  set.seed(128) 
  par(mfrow=c(1,3))  
- res.df=simul_compare(n=5,seasons=3) 
+ res.df=simul$compare(n=5,seasons=3) 
  for (mod in c("null","chance","gain")) {  
    rest=t(scale(t(res.df[res.df$model==mod,1:5]))) 
    boxplot(rest,main=mod,ylim=c(-2,2))  

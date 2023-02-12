@@ -1,11 +1,12 @@
-\name{simul_season} 
+\name{simul$season} 
 \alias{simul_season} 
+\alias{simul$season} 
 \title{ Create matches for everyone against everyone using the given model. } 
 \description{ 
   This function creates pairings for a tournament where in every round. 
   The actual match will give chances based on a certain amount of tokens in dependence of the given model. 
 } 
-\usage{ simul_season(x,token=rep(length(x),length(x)),model="null",min.value=4,memory=NULL,memory.length=1) } 
+\usage{ `simul$season(x,token=rep(length(x),length(x)),model="null",min.value=4,memory=NULL,memory.length=1)` } 
  
 \arguments{ 
   \item{x}{ vector of teams } 
@@ -29,7 +30,7 @@
 } 
 \examples{ 
 set.seed(123) 
-res=simul_season(LETTERS[1:6],model="null")  
+res=simul$season(LETTERS[1:6],model="null")  
 res 
 } 
  

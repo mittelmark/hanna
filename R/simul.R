@@ -1,33 +1,37 @@
+#' \docType{class}
 #' \name{simul} 
 #' \alias{simul} 
-#' \title{ Collection of functions which do winner-looser and network structure simulations. } 
+#' \alias{simul-class} 
+#' \title{ Environment obkject with functions do simulate winner-looser effects. } 
 #' \description{ 
-#'   The function with the simul prefix perform simulations of winner-looser effects for the paper ...
-#'   The following functions are implemented:
+#'   The functions within the simul environment perform simulations of winner-looser effects for the paper ...
+#' }
+#' \section{Methods}{
 #'   \itemize{
-#'      \item \code{\link{simul_compare}} - compare the different models for a certain number of seasons
-#'      \item \code{\link{simul_graph}} - create a adjacency matrix out of the results for a match season
-#'      \item \code{\link{simul_pairings}} - create round pairings for a season
-#'      \item \code{\link{simul_season}} - create matches for everyone against everyone using the given model
+#'      \item \code{\link[hanna:simul_compare]{simul$compare}} - compare the different models for a certain number of seasons
+#'      \item \code{\link[hanna:simul_graph]{simul$graph}} - create a adjacency matrix out of the results for a match season
+#'      \item \code{\link[hanna:simul_pairings]{simul$pairings}} - create round pairings for a season
+#'      \item \code{\link[hanna:simul_season]{simul$season}} - create matches for everyone against everyone using the given model
 #'    }
 #' }
 #'
 #' \examples{
 #' set.seed(124)
-#' res=simul_season(LETTERS[1:6],model="null") 
+#' res=simul$season(LETTERS[1:6],model="null") 
 #' res
 #' hgraph$plot(res$M)
 #' }
 
-""
-#' \name{simul_pairings}
+simul=new.env()
+#' \name{simul$pairings}
 #' \alias{simul_pairings}
+#' \alias{simul$pairings}
 #' \title{ Create matching pairs everyone against every one. }
 #' \description{
 #'   This function creates pairings for a tournament where in every round
 #'   item, teams, etc get new partners for playing.
 #' }
-#' \usage{ simul_pairings(x) }
+#' \usage{ `simul$pairings(x)` }
 #'
 #' \arguments{
 #'   \item{x}{ symmetric matrix with row and colum names being the same, or a vector of names }
@@ -39,12 +43,12 @@
 #' \examples{
 #' mt=matrix(0,nrow=4,ncol=4)
 #' rownames(mt)=colnames(mt)=LETTERS[1:4]
-#' simul_pairings(mt)
-#' simul_pairings(c("ABA","CDE","EFG"))
+#' simul$pairings(mt)
+#' simul$pairings(c("ABA","CDE","EFG"))
 #' }
 #' 
 
-simul_pairings <- function (x) {
+simul$pairings <- function (x) {
     if (is.matrix(x)  | is.data.frame(x)) {
         M=x
     } else {
@@ -67,14 +71,15 @@ simul_pairings <- function (x) {
     return(df)
 }
 
-#' \name{simul_season}
+#' \name{simul$season}
 #' \alias{simul_season}
+#' \alias{simul$season}
 #' \title{ Create matches for everyone against everyone using the given model. }
 #' \description{
 #'   This function creates pairings for a tournament where in every round.
 #'   The actual match will give chances based on a certain amount of tokens in dependence of the given model.
 #' }
-#' \usage{ simul_season(x,token=rep(length(x),length(x)),model="null",min.value=4,memory=NULL,memory.length=1) }
+#' \usage{ `simul$season(x,token=rep(length(x),length(x)),model="null",min.value=4,memory=NULL,memory.length=1)` }
 #'
 #' \arguments{
 #'   \item{x}{ vector of teams }
@@ -98,13 +103,13 @@ simul_pairings <- function (x) {
 #' }
 #' \examples{
 #' set.seed(123)
-#' res=simul_season(LETTERS[1:6],model="null") 
+#' res=simul$season(LETTERS[1:6],model="null") 
 #' res
 #' }
 #' 
 
-simul_season <- function (x,token=rep(length(x),length(x)),model='null',min.value=4,memory=NULL,memory.length=1) {
-    pairings=simul_pairings(x)
+simul$season <- function (x,token=rep(length(x),length(x)),model='null',min.value=4,memory=NULL,memory.length=1) {
+    pairings=simul$pairings(x)
     if (class(memory) == "NULL") {
         memory=lapply(x,function(x) { return(rep(0,memory.length+1)) })
         names(memory)=x
@@ -194,7 +199,7 @@ simul_season <- function (x,token=rep(length(x),length(x)),model='null',min.valu
 
 Simul_season2 <- function (x,memory=NULL,
                            memory.length=0) {
-    pairings=simul_pairings(x)
+    pairings=simul$pairings(x)
     nms=x
     token=rep(length(nms),length(nms))
     tok=length(nms)
@@ -245,7 +250,8 @@ Simul_season2 <- function (x,memory=NULL,
 
 }
 
-#' \name{simul_graph}
+#' \name{simul$graph}
+#' \alias{simul$graph}
 #' \alias{simul_graph}
 #' \title{ Create a adjacency matrix out of the results for a match season. }
 #' \description{
@@ -254,7 +260,7 @@ Simul_season2 <- function (x,memory=NULL,
 #'    The edges will be directed from the winning to the loosing team in case the mode is "win" or between
 #'    drawing teams in case the mode is "draw".
 #' }
-#' \usage{ simul_graph(x,mode="draw") }
+#' \usage{ `simul$graph(x,mode="draw")` }
 #'
 #' \arguments{
 #'   \item{x}{ a season matrix with wins encoded as 1, losses as -1 and draws as 0 }
@@ -263,16 +269,16 @@ Simul_season2 <- function (x,memory=NULL,
 #' \value{ Adjacency matrix } 
 #' \examples{
 #' set.seed(123)
-#' res=simul_season(LETTERS[1:6],model="null") 
+#' res=simul$season(LETTERS[1:6],model="null") 
 #' res$M
-#' U = simul_graph(res$M,mode='draw')
+#' U = simul$graph(res$M,mode='draw')
 #' U
-#' D = simul_graph(res$M,mode='win')
+#' D = simul$graph(res$M,mode='win')
 #' U
 #' }
 #' 
 
-simul_graph <- function (x,mode="draw") {
+simul$graph <- function (x,mode="draw") {
     A=x
     if (mode == "draw") {
         A[A!=0]=2
@@ -286,14 +292,15 @@ simul_graph <- function (x,mode="draw") {
 }
 
 
-#' \name{simul_compare}
+#' \name{simul$compare}
+#' \alias{simul$compare}
 #' \alias{simul_compare}
 #' \title{ Compare the different models for a certain number of seasons. }
 #' \description{
 #'   This function does a comparison for different models determine
 #'   the amount of triads after a certain number of seasons.
 #' }
-#' \usage{ simul_compare(n=5,agents=12,seasons=3) }
+#' \usage{ `simul$compare(n=5,agents=12,seasons=3)` }
 #' \arguments{
 #'   \item{n}{ how many repeats per model, default: 5}
 #'   \item{agents}{how many agents/teams, default: 12} 
@@ -304,14 +311,14 @@ simul_graph <- function (x,mode="draw") {
 #' \examples{
 #'  set.seed(128)
 #'  par(mfrow=c(1,3)) 
-#'  res.df=simul_compare(n=5,seasons=3)
+#'  res.df=simul$compare(n=5,seasons=3)
 #'  for (mod in c("null","chance","gain")) { 
 #'    rest=t(scale(t(res.df[res.df$model==mod,1:5])))
 #'    boxplot(rest,main=mod,ylim=c(-2,2)) 
 #'    lines(1:5,apply(rest,2,median))
 #'  }
 #' }
-simul_compare <- function (n=5,agents=12,seasons=3) {
+simul$compare <- function (n=5,agents=12,seasons=3) {
     nodes=agents
     res.df=data.frame(dd=c(),ds=c(),pa=c(),tr=c(),cy=c())
     plengths=c()
@@ -323,12 +330,12 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
                 token[1]=token[1]*2
                 token[2]=token[1]
                 names(token)=LETTERS[1:nodes]
-                res=simul_season(LETTERS[1:nodes],model=mod,token=token)
+                res=simul$season(LETTERS[1:nodes],model=mod,token=token)
             } else {
-                res=simul_season(LETTERS[1:nodes],model=mod)
+                res=simul$season(LETTERS[1:nodes],model=mod)
             }
             for (s in 2:seasons) {
-                res=simul_season(LETTERS[1:nodes],token=res$token,model=mod)   
+                res=simul$season(LETTERS[1:nodes],token=res$token,model=mod)   
             }
             A=res$M
             A[A<0]=0
@@ -340,14 +347,14 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
             wl[wl==Inf]=2*max(wl[wl!=Inf])
             wl=mean(wl[upper.tri(wl)])
             wlengths=c(wlengths,wl)
-            res.df=rbind(res.df,t(as.data.frame(unlist(hgraph$triads(simul_graph(res$M,mode="win"))))))
+            res.df=rbind(res.df,t(as.data.frame(unlist(hgraph$triads(simul$graph(res$M,mode="win"))))))
         }   
     }   
     for (mem in c(1,3,5)) {
         for (i in 1:n) {
-            res=simul_season(LETTERS[1:nodes],model="memory",memory.length=mem)
+            res=simul$season(LETTERS[1:nodes],model="memory",memory.length=mem)
             for (s in 2:seasons) {
-                res=simul_season(LETTERS[1:nodes],token=res$token,model="memory",memory=res$memory,memory.length=mem)   
+                res=simul$season(LETTERS[1:nodes],token=res$token,model="memory",memory=res$memory,memory.length=mem)   
             }
             A=res$M
             A[A<0]=0
@@ -367,7 +374,7 @@ simul_compare <- function (n=5,agents=12,seasons=3) {
                 wl=mean(wl[upper.tri(wl)])
             }
             wlengths=c(wlengths,wl)
-            res.df=rbind(res.df,t(as.data.frame(unlist(hgraph$triads(simul_graph(res$M,mode="win"))))))
+            res.df=rbind(res.df,t(as.data.frame(unlist(hgraph$triads(simul$graph(res$M,mode="win"))))))
         }   
     }   
     res.df=cbind(res.df,model=rep(c("null","chance","gain","keystone","memory1","memory3","memory5"),each=n),pls=plengths,wls=wlengths)
