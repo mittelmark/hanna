@@ -24,13 +24,13 @@ Season pairings:
 
 ```{r}
 library(hanna)
-simul_pairings(LETTERS[1:4])
+simul$pairings(LETTERS[1:4])
 ```
 
 Play a single round:
 
 ```{r}
-res=simul_season(LETTERS[1:6])
+res=simul$season(LETTERS[1:6])
 res
 ```
 
@@ -38,14 +38,14 @@ Let's now conver this to an undirected graph where edges are drawn between
 teams which draw against each other:
 
 ```{r}
-U = simul_graph(res$M,mode='draw')
+U = simul$graph(res$M,mode='draw')
 U
 ```
 
 Now a directed graph where an edge is drawn from the winning team to the loosing team in a match.
 
 ```{r fig.width=8,fig.height=4,out.width=1000}
-D = simul_graph(res$M,mode='win')
+D = simul$graph(res$M,mode='win')
 D
 par(mfrow=c(1,2),mai=rep(0.2,4))
 hgraph$plot(D,vertex.color=hgraph$colors(D))
@@ -64,27 +64,27 @@ for (mode in c('null','memory5','gain','keystone')) {
     for (i in 1:30) {
         if (i == 1) {
             if (mode == "keystone") {
-                res=simul_season(LETTERS[1:n],model=mode,token=c(24,24,rep(12,n-2)))
+                res=simul$season(LETTERS[1:n],model=mode,token=c(24,24,rep(12,n-2)))
             } else if (mode=="memory1") {
-               res=simul_season(LETTERS[1:n],model=mode,memory.length=1)
+               res=simul$season(LETTERS[1:n],model=mode,memory.length=1)
             } else if (mode=="memory5") {
-               res=simul_season(LETTERS[1:n],model=mode,memory.length=5)
+               res=simul$season(LETTERS[1:n],model=mode,memory.length=5)
             } else {
-               res=simul_season(LETTERS[1:n],model=mode)
+               res=simul$season(LETTERS[1:n],model=mode)
             }
         } else {
             if (mode=="memory1") {
-               res=simul_season(LETTERS[1:n],model=mode,memory.length=1,memory=res$memory)
+               res=simul$season(LETTERS[1:n],model=mode,memory.length=1,memory=res$memory)
             } else if (mode=="memory5") {
-               res=simul_season(LETTERS[1:n],model=mode,memory.length=5,memory=res$memory)
+               res=simul$season(LETTERS[1:n],model=mode,memory.length=5,memory=res$memory)
             }  else {
-                res=simul_season(LETTERS[1:12],token=res$token,model=mode)
+                res=simul$season(LETTERS[1:12],token=res$token,model=mode)
             }
         }  
-        D = simul_graph(res$M,mode='win') 
-        cols=simul_colors(D,col=colors)
+        D = simul$graph(res$M,mode='win') 
+        cols=simul$colors(D,col=colors)
         if (i %in% c(1,5,10,30)) {
-            simul_plot(D,vertex.color=cols,vertex.size=0.8)
+            simul$plot(D,vertex.color=cols,vertex.size=0.8)
             if (i == 1) {
                 if (mode == "gain") {
                    mtext("winlose",side=2,cex=1.5,line=0)
@@ -109,7 +109,7 @@ set.seed(128)
 pdf("~/Downloads/2023-02/triads.pdf",width=14,height=14)
 par(mfcol=c(4,4),omi=c(0.5,0.7,0.5,0.3),mai=rep(0.2,4))  
 for (i in c(1,5,10,30)) {
-    res.df=simul_compare(n=10,seasons=i) 
+    res.df=simul$compare(n=10,seasons=i) 
     for (mod in c("null", "memory5","gain","keystone")) {  
        #rest=t(scale(t(res.df[res.df$model==mod,1:5]))) 
        rest=t(apply(res.df[res.df$model==mod,1:5],1,function(x) { (x/sum(x))*100} ))
