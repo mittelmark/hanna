@@ -13,7 +13,7 @@ vignette: >
 
 ## Introduction
 
-The `hgraph` module offers a few functions to deal with adjacency matrices
+The `hgraph` object offers a few functions to deal with adjacency matrices
 which are for instance created from the `simul` module. This module is a
 simple R environment and can be inspected therefor using the `ls` function.
   
@@ -34,7 +34,7 @@ These private functions are starting with a dot at the beginning.
 ## Creating an example  graph 
 
 ```{r fig.width=9,fig.height=6}
-W=hgraph$new()
+W=hgraph$graph()
 cols=hgraph$colors(W)
 hgraph$plot(W,vertex.color=cols)
 ```
