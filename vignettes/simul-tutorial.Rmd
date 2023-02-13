@@ -1,0 +1,43 @@
+---
+title: "Example simulations for the hanna package using the simul module"
+author: Detlef Groth, University of Potsdam, Germany
+date: 2023-02-13
+vignette: >
+  %\VignetteIndexEntry{Simul module tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<center>[hgraph module](hgraph.html) - [simul module](simul-tutorial.html) -
+[paper figures](figures.html)</center>
+
+## Introduction
+
+The hanna package contains two modules, environments for doing winner looser
+simulations and evaluating the resulting network structure.
+
+The simul environment provides the following methods:
+
+* _simul$pairings_ - create round pairings for a single season
+* _simul$season_ - create matches for everyone against everyone using the given model and evaluate the results
+* _simul$graph_ - create a adjacency matrix out of the results for a match season
+* _simul$compare_ - compare the different models for a certain number of seasons, does a lot of iterations to compare the models several times
+
+## simul$pairings
+
+This just allows to create matches where in every round the agents get a new partner, here an example for a small group of 6 agents giving all together 15 matches:
+
+```{r}
+library(hanna)
+simul$pairings(LETTERS[1:6])
+```
+
+The function is just needed internally in the `simul$season` function.
+
+## simul$season
+
+This module is used to perform a season where every agent is matched against
+other agents a single time and the winners earns token from the looser. ## EOF
+
+
+
