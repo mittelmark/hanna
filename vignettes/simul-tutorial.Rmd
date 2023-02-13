@@ -29,6 +29,7 @@ This just allows to create matches where in every round the agents get a new par
 
 ```{r}
 library(hanna)
+set.seed(123)
 simul$pairings(LETTERS[1:6])
 ```
 
@@ -37,7 +38,25 @@ The function is just needed internally in the `simul$season` function.
 ## simul$season
 
 This module is used to perform a season where every agent is matched against
-other agents a single time and the winners earns token from the looser. ## EOF
+other agents a single time and the winners earns token from the looser. Let's
+do a single season using the null model where the outcome of a match does not
+depend on the amount of token the agents lost or gained during the competitions.
 
+
+```{r}
+res=simul$season(LETTERS[1:8])
+res$token
+res$M
+```
+
+A -1 in the matrix means a loss, a 1 a win, where you must read rowwise. So for instance A was loosing agains B in this season.
+The number of tokens is directly related to the number of wins and losses
+after a single season. We can use the token to create a new season with non-equal starting conditions.
+
+```{r}
+res2=simul$season(LETTERS[1:8],token=res$token)
+res2$token
+res2$M
+```
 
 
