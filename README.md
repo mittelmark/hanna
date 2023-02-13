@@ -34,6 +34,7 @@ If the installation was succesful, you can run a single season giving the
 agents as many tokens as there are agents in the game using the default null model like this:
 
 ```
+> library(hanna)
 > res=simul$season(LETTERS[1:6])
 > res$token
 ## $token
@@ -64,8 +65,7 @@ matrix like this:
 ```
 > A = simul$graph(res$M,model='win')
 > par(mfrow=c(1,2),mai=rep(0.4,2))  
-> graph$plot(A)  
-> cols=hgraph$colors(A)
+> hgraph$plot(A)  
 > cols=hgraph$colors(A)
 > hgraph$plot(A,vertex.color=cols)
 ```
