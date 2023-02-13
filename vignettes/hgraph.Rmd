@@ -31,7 +31,7 @@ ls(hgraph,all=TRUE)
 
 These private functions are starting with a dot at the beginning.
 
-## Creating an example  graph 
+## Creating an example graph 
 
 ```{r fig.width=9,fig.height=6}
 W=hgraph$graph()
