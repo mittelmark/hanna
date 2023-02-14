@@ -264,7 +264,7 @@ Simul_season2 <- function (x,memory=NULL,
 #'
 #' \arguments{
 #'   \item{x}{ a season matrix with wins encoded as 1, losses as -1 and draws as 0 }
-#'   \item{mode}{ either draw or win, default: 'draw'5 }
+#'   \item{mode}{ either draw or win, default: 'draw' }
 #' }
 #' \value{ Adjacency matrix } 
 #' \examples{
@@ -339,7 +339,7 @@ simul$compare <- function (n=5,agents=12,seasons=3) {
             }
             A=res$M
             A[A<0]=0
-            A=hgraph$.D2u(A)
+            A=hgraph$d2u(A)
             pl=hgraph$average_path_length(A,mode="undirected")
             plengths=c(plengths,pl)
             W=Simul_g2w(A)
@@ -358,7 +358,7 @@ simul$compare <- function (n=5,agents=12,seasons=3) {
             }
             A=res$M
             A[A<0]=0
-            A=hgraph$.D2u(A)
+            A=hgraph$d2u(A)
             pl=hgraph$average_path_length(A,mode="undirected")
             if (pl==Inf) {
                 pl=NA
@@ -386,7 +386,7 @@ simul$compare <- function (n=5,agents=12,seasons=3) {
 Simul_g2w <- function (x) {
     x[x<0]=0
     x[x>0]=1
-    u=hgraph$.D2u(x)
+    u=hgraph$d2u(x)
     degrees = apply(u,1,function(x) { return(length(which(x!= 0))) })
     w=u
     for (i in 1:(nrow(w)-1)) {

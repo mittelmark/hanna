@@ -1,16 +1,16 @@
 ---
-title: "Figures for the paper ..."
-author: Detlef Groth
+title: "Hermanussen et. al. (2023) - Paper figures"
+author: Detlef Groth, University of Potsdam, Germany
 date: 2023-02-05
-output: rmarkdown::html_vignette
+output: function () { rmarkdown::html_vignette(toc=TRUE,css="style.css") }
 vignette: >
-  %\VignetteIndexEntry{Hermanussen et. al. figures}
+  %\VignetteIndexEntry{Hermanussen et. al. (2023) - Paper figures}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+include-before: |
+    <center>[hgraph module](hgraph-tutorial.html) - [simul module](simul-tutorial.html) -
+    [paper figures](figures.html)</center>
 ---
-
-<center>[hgraph module](hgraph-tutorial.html) - [simul module](simul-tutorial.html) -
-[paper figures](figures.html)</center>
 
 ## Introduction
 
@@ -103,11 +103,13 @@ for (mode in c('null','memory5','gain','keystone')) {
 dev.off()
 ```
 
+![networks.png](networks.png)
+
 ## Triad counting
 
 ```{r fig.width=14,fig.height=14,out.width=1000,eval=FALSE}
 set.seed(128) 
-pdf("~/Downloads/2023-02/triads.pdf",width=14,height=14)
+pdf("triads.pdf",width=14,height=14)
 par(mfcol=c(4,4),omi=c(0.5,0.7,0.5,0.3),mai=rep(0.2,4))  
 for (i in c(1,5,10,30)) {
     res.df=simul$compare(n=10,seasons=i) 
@@ -145,6 +147,8 @@ for (i in c(1,5,10,30)) {
 dev.off()
 ```
 
+![triads.png](triads.png)
+
 ## Measure sd and mean for the average path lengths
 
 ```{r eval=FALSE}
@@ -163,10 +167,9 @@ head(agg)
 ```{r eval=FALSE}
 library(knitr)
 knitr::kable(agg)
-write.table(agg,file="~/Downloads/2023-02/path-lengths.tab",sep="\t",quote=FALSE)
+write.table(agg,file="path-lengths.tab",sep="\t",quote=FALSE)
 ```
 
-## EOF
 
 
 

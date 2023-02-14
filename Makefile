@@ -4,7 +4,7 @@ build:
 	R CMD build . 
 
 check: build man/simul.Rd man/hgraph.Rd
-	R CMD check --html $(PKG)_$(VERSION).tar.gz
+	R CMD check $(PKG)_$(VERSION).tar.gz
 
 man/%.Rd: R/%.R
 	Rscript bin/rman.R $<

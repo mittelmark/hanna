@@ -11,6 +11,7 @@
    \itemize{ 
       \item \code{\link[hanna:hgraph_average_path_length]{hgraph$average_path_length}} - calculate the average path length for a given adjacency matrix 
       \item \code{\link[hanna:hgraph_colors]{hgraph$colors}} - create a color vector based on node degrees  
+      \item \code{\link[hanna:hgraph_d2u]{hgraph$d2u}} - convert a directed into an undirected graph 
       \item \code{\link[hanna:hgraph_degree]{hgraph$degree}} - calculate the degree centrality for all nodes 
       \item \code{\link[hanna:hgraph_eccentricity]{hgraph$eccentricity}} - calculate eccentricity centrality for all nodes 
       \item \code{\link[hanna:hgraph_graph]{hgraph$graph}} - create some example graphs 

@@ -2,14 +2,16 @@
 title: "Example simulations for the hanna package using the simul module"
 author: Detlef Groth, University of Potsdam, Germany
 date: 2023-02-13
+output: function () { rmarkdown::html_vignette(toc=TRUE,css="style.css") }
 vignette: >
-  %\VignetteIndexEntry{Simul module tutorial}
+  %\VignetteIndexEntry{Example simulations for the hanna package using the simul module}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+include-before: |
+    <center>[hgraph module](hgraph-tutorial.html) - [simul module](simul-tutorial.html) -
+    [paper figures](figures.html)</center>
 ---
 
-<center>[hgraph module](hgraph-tutorial.html) - [simul module](simul-tutorial.html) -
-[paper figures](figures.html)</center>
 
 ## Introduction
 
@@ -23,7 +25,7 @@ The simul environment provides the following methods:
 * _simul$graph_ - create a adjacency matrix out of the results for a match season
 * _simul$compare_ - compare the different models for a certain number of seasons, does a lot of iterations to compare the models several times
 
-## simul$pairings
+## Pairings
 
 This just allows to create matches where in every round the agents get a new partner, here an example for a small group of 6 agents giving all together 15 matches:
 
@@ -35,7 +37,7 @@ simul$pairings(LETTERS[1:6])
 
 The function is just needed internally in the `simul$season` function.
 
-## simul$season
+## Seasons 
 
 This module is used to perform a season where every agent is matched against
 other agents a single time and the winners earns token from the looser. Let's
@@ -49,9 +51,10 @@ res$token
 res$M
 ```
 
-A -1 in the matrix means a loss, a 1 a win, where you must read rowwise. So for instance A was loosing agains B in this season.
-The number of tokens is directly related to the number of wins and losses
-after a single season. We can use the token to create a new season with non-equal starting conditions.
+A -1 in the matrix means a loss, a 1 a win, where you must read rowwise. So
+for instance A was loosing agains B in this season. The number of tokens is
+directly related to the number of wins and losses after a single season. We
+can use the token to create a new season with non-equal starting conditions.
 
 ```{r}
 res2=simul$season(LETTERS[1:8],token=res$token)
@@ -59,4 +62,69 @@ res2$token
 res2$M
 ```
 
+Using the null model there should be no big changes after the iterations as
+the chance to win or loose is not dependent on the current amount of tokens.
+Let's do a loop over ten seasons, each time sending the current number of
+tokens into the next iteration and let us compare this with the gain modelm
+the winner-looser model where the chance to win or loose is dependend on the
+current number of token:
 
+```{r}
+for (i in 1:10) {
+   res2=simul$season(LETTERS[1:8],token=res2$token,mode="null")
+}
+res2$token
+res.gain=simul$season(LETTERS[1:8],model="gain")
+for (i in 1:10) {
+   res.gain=simul$season(LETTERS[1:8],token=res.gain$token,model="gain")
+}
+res.gain$token
+```    
+
+As you can see the amount of token in the gain model is less balanced than
+that in the null mode. Let's plot the resulting graphs side by side. For this
+we use the hgraph module which offers a view utility functions to work with
+graphs:
+
+
+```{r fig.width=9,fig.height=6,out.width=600}
+par(mfrow=c(1,2),mai=c(0.1,0.1,0.7,0.1))
+# make adjacency matrix out of win/loss matrix
+A.null=simul$graph(res2$M,mode="win")
+A.gain=simul$graph(res.gain$M,mode="win")
+cols=hgraph$colors(A.null)
+hgraph$plot(A.null,vertex.color=cols)
+mtext(side=3,"null",cex=2)
+cols=hgraph$colors(A.gain)
+hgraph$plot(A.gain,vertex.color=cols)
+mtext(side=3,"winlose",cex=2)
+```
+
+In red color are agents which does not loose any gaim, in blue are agents
+which does not win any game, in grey are agents displayed which win or lost at
+least one game each. As in the null model the chances to win and loose are not
+dependend on the token, you can see in the left figure that no team does not
+only win and draw or does only loose and draw wheres the agent G in the
+winner/looser model does not loose any game.
+
+## Triads
+
+The `hgraph` object contains as well a method to count the triads in the graph:
+
+```{r}
+unlist(hgraph$triads(A.null))
+unlist(hgraph$triads(A.gain))
+```
+
+Let's visualue the numbers in percentages for these single runs in a dotchart
+diagram.
+
+```{r fig.width=9,fig.height=6,out.width=800}
+plot(1,type="n",xlim=c(0,6),ylim=c(0,30),axes=FALSE,xlab="triads",ylab="counts")
+points(x=c(1:5),y=unlist(hgraph$triads(A.null)),pch=17,col='grey70',cex=2.5)
+points(x=c(1:5),y=unlist(hgraph$triads(A.gain)),pch=19,col='red',cex=2)
+axis(1,at=1:5,labels=names(hgraph$triads(A.null)))
+axis(2)
+legend('topright',c("null","winlose"),fill=c('grey70','red'),cex=1.5)
+box()
+```

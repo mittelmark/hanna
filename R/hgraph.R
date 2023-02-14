@@ -12,6 +12,7 @@
 #'    \itemize{
 #'       \item \code{\link[hanna:hgraph_average_path_length]{hgraph$average_path_length}} - calculate the average path length for a given adjacency matrix
 #'       \item \code{\link[hanna:hgraph_colors]{hgraph$colors}} - create a color vector based on node degrees 
+#'       \item \code{\link[hanna:hgraph_d2u]{hgraph$d2u}} - convert a directed into an undirected graph
 #'       \item \code{\link[hanna:hgraph_degree]{hgraph$degree}} - calculate the degree centrality for all nodes
 #'       \item \code{\link[hanna:hgraph_eccentricity]{hgraph$eccentricity}} - calculate eccentricity centrality for all nodes
 #'       \item \code{\link[hanna:hgraph_graph]{hgraph$graph}} - create some example graphs
@@ -172,7 +173,7 @@ hgraph$shortest_paths <- function (x,mode="directed",weighted=FALSE,FUN=mean) {
     A=x
     A[A==-1]=0
     if (mode == "undirected" & !weighted) {
-        A=self$.D2u(A)
+        A=self$d2u(A)
     } else if (mode == "undirected") {
         for (i in 1:(nrow(A)-1)) {
             for (j in i:nrow(A)) {
@@ -272,6 +273,39 @@ hgraph$colors <- function (x,col=c('skyblue','grey80','salmon')) {
     return(cols)
 }
 
+#' \name{hgraph$d2u}
+#' \alias{hgraph_d2u}
+#' \alias{hgraph$d2u}
+#' \title{ Covert a directed graph into an undirected one. }
+#'  \usage{`hgraph$d2u(x)`}
+#' \description{
+#'   This function converts an directed graph into an undirected one, the resulting
+#'   adjacency matrix will be symmetric.
+#' }
+#' \arguments{
+#'   \item{x}{ adjacency matrix }
+#' }
+#' \value{ adjacency matrix }
+#' \examples{
+#' A=hgraph$graph(type="werner")
+#' A
+#' U=hgraph$d2u(A)
+#' par(mfrow=c(1,2))
+#' lay=hgraph$layout(A)
+#' plot(A,layout=lay)
+#' plot(U,layout=lay)
+#' }
+#' 
+
+hgraph$d2u <- function (g) {
+    g[lower.tri(g)]=g[lower.tri(g)]+t(g)[lower.tri(g)]
+    g[upper.tri(g)]=g[upper.tri(g)]+t(g)[upper.tri(g)]    
+    g[g>0]=1
+    g[g<0]=-1
+    return(g)
+}
+
+
 
 #' \name{hgraph$degree}
 #' \alias{hgraph_degree}
@@ -299,7 +333,7 @@ hgraph$colors <- function (x,col=c('skyblue','grey80','salmon')) {
 hgraph$degree <- function (x,mode="all") {
     self=hgraph
     if (mode == "all" | all(x == t(x))) {
-        x=self$.D2u(x)
+        x=self$d2u(x)
         return(apply(x,1,function (x) { return(length(which(x>0))) }))
     } else if (mode == "in") {
         return(apply(x,2,function(x) { return(length(which(x>0))) }))
@@ -420,7 +454,7 @@ hgraph$layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interacti
     self=hgraph
     A=x
     if (!identical(A,t(A))) {
-        A=self$.D2u(A)
+        A=self$d2u(A)
     }
     if (ncol(A)==3 & mode %in% c("sam","mds")) {
         mode="circle"
@@ -674,14 +708,6 @@ hgraph$plot = function (x,layout='sam',
 plot.graph=hgraph$plot
 
 # private functions
-
-hgraph$.D2u <- function (g) {
-    g[lower.tri(g)]=g[lower.tri(g)]+t(g)[lower.tri(g)]
-    g[upper.tri(g)]=g[upper.tri(g)]+t(g)[upper.tri(g)]    
-    g[g>0]=1
-    g[g<0]=-1
-    return(g)
-}
 
 
 

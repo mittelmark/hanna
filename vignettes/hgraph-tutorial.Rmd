@@ -1,16 +1,17 @@
 ---
 title: "Short introduction into the hgraph module"
-author: Detlef Groth
+author: Detlef Groth, Detlef Groth, University of Potsdam, Germany
 date: 2023-02-09
-output: rmarkdown::html_vignette
+output: function () { rmarkdown::html_vignette(toc=TRUE,css="style.css") }
 vignette: >
   %\VignetteIndexEntry{hgraph introduction}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+include-before: |
+    <center>[hgraph module](hgraph-tutorial.html) - [simul module](simul-tutorial.html) -
+    [paper figures](figures.html)</center>
+  
 ---
-
-<center>[hgraph module](hgraph-tutorial.html) - [simul module](simul-tutorial.html) -
-[paper figures](figures.html)</center>
 
 ## Introduction
 
@@ -34,14 +35,66 @@ These private functions are starting with a dot at the beginning.
 
 ## Creating an example graph 
 
+There is as well a function which can be used to create some example graphs.
+Here an example were we create a so called Werner graph.
+
 ```{r fig.width=9,fig.height=6}
 W=hgraph$graph()
 cols=hgraph$colors(W)
 hgraph$plot(W,vertex.color=cols)
 ```
-  
 
-## EOF
+The colors are indicating nodes with only outgoing edges in red, nodes with
+in- and outgoing edges in blue and nodes with in- and outgoing edges in grey.
+
+Let's create a larger random graph here:
+
+```{r,fig.width=9,fig.height=6,out.width=800}
+set.seed(124)
+R=hgraph$graph(type="random",nodes=10, edges=14)
+cols=hgraph$colors(R)
+hgraph$plot(R,vertex.color=cols)
+```
+
+## Graph conversion
+
+You can as well create undirected graphs, where the edges have no direction
+out of directed graphs.
+
+```{r fig.width=9,fig.height=6,out.width=800}
+R
+U=hgraph$d2u(R)
+U
+lay=hgraph$layout(U)
+par(mfrow=c(1,2))
+plot(R,vertex.color=cols,layout=lay)
+plot(U,layout=lay)
+```
+
+## Graph information
+
+We can extract various information about graphs and their nodes. For instance
+how many edges has every node using the degree function or what is the length
+of the shortest paths between all nodes. Here some example code:
+
+
+```{r}
+hgraph$degree(U)
+hgraph$shortest_paths(U)
+```
+
+For an graph with several components the distance can be as well `Inf(inite)`.
+Let's remove the edge between the nodes G and E for example and then
+recalculate the distances.
+
+```{r}
+U2=U
+U2[c('G','E'),c('G','E')]=0
+hgraph$shortest_paths(U2)
+```
+
+If you need more functionality for working with graphs I suggest you use the
+nice `igraph` package which is available for R.
 
 
 

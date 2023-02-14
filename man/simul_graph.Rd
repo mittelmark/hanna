@@ -12,7 +12,7 @@
  
 \arguments{ 
   \item{x}{ a season matrix with wins encoded as 1, losses as -1 and draws as 0 } 
-  \item{mode}{ either draw or win, default: 'draw'5 } 
+  \item{mode}{ either draw or win, default: 'draw' } 
 } 
 \value{ Adjacency matrix }  
 \examples{ 
