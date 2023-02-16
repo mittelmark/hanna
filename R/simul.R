@@ -1,26 +1,36 @@
-#' \docType{class}
-#' \name{simul} 
-#' \alias{simul} 
-#' \alias{simul-class} 
-#' \title{ Environment obkject with functions do simulate winner-looser effects. } 
-#' \description{ 
-#'   The functions within the simul environment perform simulations of winner-looser effects for the paper ...
-#' }
-#' \section{Methods}{
-#'   \itemize{
-#'      \item \code{\link[hanna:simul_compare]{simul$compare}} - compare the different models for a certain number of seasons
-#'      \item \code{\link[hanna:simul_graph]{simul$graph}} - create a adjacency matrix out of the results for a match season
-#'      \item \code{\link[hanna:simul_pairings]{simul$pairings}} - create round pairings for a season
-#'      \item \code{\link[hanna:simul_season]{simul$season}} - create matches for everyone against everyone using the given model
-#'    }
-#' }
-#'
-#' \examples{
-#' set.seed(124)
-#' res=simul$season(LETTERS[1:6],model="null") 
-#' res
-#' hgraph$plot(res$M)
-#' }
+# ' \docType{class}
+# ' \name{simul}
+# ' \alias{simul}
+# ' \alias{simul-class}
+# ' \title{ Environment obkject with functions do simulate winner-looser
+# effects. }
+# ' \description{
+# ' The functions within the simul environment perform simulations of
+# winner-looser
+# ' effects for the paper ...
+# ' }
+# ' \section{Methods}{
+# ' \itemize{
+# ' \item \code{\link[hanna:simul_compare]{simul$compare}} - compare the
+# different models
+# ' for a certain number of seasons
+# ' \item \code{\link[hanna:simul_graph]{simul$graph}} - create a adjacency
+# matrix out of the
+# ' results for a match season
+# ' \item \code{\link[hanna:simul_pairings]{simul$pairings}} - create round
+# pairings for a season
+# ' \item \code{\link[hanna:simul_season]{simul$season}} - create matches for
+# everyone
+# ' against everyone using the given model
+# '    }
+# ' }
+# '
+# ' \examples{
+# ' set.seed(124)
+# ' res=simul$season(LETTERS[1:6],model="null")
+# ' res
+# ' hgraph$plot(res$M)
+# ' } 
 
 simul=new.env()
 #' \name{simul$pairings}
@@ -77,9 +87,11 @@ simul$pairings <- function (x) {
 #' \title{ Create matches for everyone against everyone using the given model. }
 #' \description{
 #'   This function creates pairings for a tournament where in every round.
-#'   The actual match will give chances based on a certain amount of tokens in dependence of the given model.
+#'   The actual match will give chances based on a certain amount of tokens in dependence 
+#'   of the given model.
 #' }
-#' \usage{ `simul$season(x,token=rep(length(x),length(x)),model="null",min.value=4,memory=NULL,memory.length=1)` }
+#' \usage{ `simul$season(x,token=rep(length(x),length(x)),model="null",
+#'                            min.value=4,memory=NULL,memory.length=1)` }
 #'
 #' \arguments{
 #'   \item{x}{ vector of teams }
@@ -323,7 +335,7 @@ simul$compare <- function (n=5,agents=12,seasons=3) {
     res.df=data.frame(dd=c(),ds=c(),pa=c(),tr=c(),cy=c())
     plengths=c()
     wlengths=c()
-    for (mod in c("null","chance","gain","keystone")) {
+    for (mod in c("null","gain","chance","keystone")) {
         for (i in 1:n) {
             if (mod == "keystone") {
                 token=rep(agents,agents)
@@ -340,16 +352,18 @@ simul$compare <- function (n=5,agents=12,seasons=3) {
             A=res$M
             A[A<0]=0
             A=hgraph$d2u(A)
-            pl=hgraph$average_path_length(A,mode="undirected")
+            pl=hgraph$average_path_length(A,infinite=nrow(A))
             plengths=c(plengths,pl)
             W=Simul_g2w(A)
-            wl=hgraph$shortest_paths(W,mode="undirected")
+            wl=hgraph$shortest_paths(W)
             wl[wl==Inf]=2*max(wl[wl!=Inf])
             wl=mean(wl[upper.tri(wl)])
             wlengths=c(wlengths,wl)
+            recover()
             res.df=rbind(res.df,t(as.data.frame(unlist(hgraph$triads(simul$graph(res$M,mode="win"))))))
         }   
     }   
+    # memory 1, 3, 5
     for (mem in c(1,3,5)) {
         for (i in 1:n) {
             res=simul$season(LETTERS[1:nodes],model="memory",memory.length=mem)
@@ -359,14 +373,14 @@ simul$compare <- function (n=5,agents=12,seasons=3) {
             A=res$M
             A[A<0]=0
             A=hgraph$d2u(A)
-            pl=hgraph$average_path_length(A,mode="undirected")
+            pl=hgraph$average_path_length(A,infinite=nrow(A))
             if (pl==Inf) {
                 pl=NA
                 #wl[wl==Inf]=2*max(wl[wl!=Inf])
             } 
             plengths=c(plengths,pl)
             W=Simul_g2w(A)
-            wl=hgraph$shortest_paths(W,mode="undirected")
+            wl=hgraph$shortest_paths(W)
             if (any(wl==Inf)) {
                 wl=NA
                 #wl[wl==Inf]=2*max(wl[wl!=Inf])

@@ -94,7 +94,9 @@ hgraph$shortest_paths(U2)
 ```
 
 If you need more functionality for working with graphs I suggest you use the
-nice `igraph` package which is available for R.
+nice `igraph` package which is available for R. This class is only intended to
+be a helper object for the `simil` object for extracting graph related
+information and for visualization.
 
 
 

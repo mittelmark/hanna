@@ -4,9 +4,11 @@
 \title{ Create matches for everyone against everyone using the given model. } 
 \description{ 
   This function creates pairings for a tournament where in every round. 
-  The actual match will give chances based on a certain amount of tokens in dependence of the given model. 
+  The actual match will give chances based on a certain amount of tokens in dependence  
+  of the given model. 
 } 
-\usage{ `simul$season(x,token=rep(length(x),length(x)),model="null",min.value=4,memory=NULL,memory.length=1)` } 
+\usage{ `simul$season(x,token=rep(length(x),length(x)),model="null", 
+                           min.value=4,memory=NULL,memory.length=1)` } 
  
 \arguments{ 
   \item{x}{ vector of teams } 

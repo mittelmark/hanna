@@ -55,9 +55,9 @@ hgraph$plot(U)
 
 ## Model comparison
 
-```{r fig.width=14,fig.height=18,out.width=900,eval=FALSE}
-pdf("~/Downloads/2023-02/networks.pdf",width=14,height=14)
-set.seed(123)
+```{r fig.width=14,fig.height=18,out.width=900,eval=TRUE}
+png("networks.png",width=900,height=900)
+set.seed(128)
 par(mfrow=c(4,4),mai=c(0.0,0.5,0.5,0.0))
 colors=c('grey80','#ff9999','#bb5555')
 n=12
@@ -83,9 +83,9 @@ for (mode in c('null','memory5','gain','keystone')) {
             }
         }  
         D = simul$graph(res$M,mode='win') 
-        cols=simul$colors(D,col=colors)
+        cols=hgraph$colors(D,col=colors)
         if (i %in% c(1,5,10,30)) {
-            simul$plot(D,vertex.color=cols,vertex.size=0.8)
+            hgraph$plot(D,vertex.color=cols,vertex.size=0.8)
             if (i == 1) {
                 if (mode == "gain") {
                    mtext("winlose",side=2,cex=1.5,line=0)
@@ -103,13 +103,15 @@ for (mode in c('null','memory5','gain','keystone')) {
 dev.off()
 ```
 
+<center>
 ![networks.png](networks.png)
+</center>
 
 ## Triad counting
 
-```{r fig.width=14,fig.height=14,out.width=1000,eval=FALSE}
-set.seed(128) 
-pdf("triads.pdf",width=14,height=14)
+```{r fig.width=14,fig.height=14,out.width=800,eval=TRUE}
+set.seed(129) 
+png("triads.png",width=900,height=900)
 par(mfcol=c(4,4),omi=c(0.5,0.7,0.5,0.3),mai=rep(0.2,4))  
 for (i in c(1,5,10,30)) {
     res.df=simul$compare(n=10,seasons=i) 
@@ -147,27 +149,38 @@ for (i in c(1,5,10,30)) {
 dev.off()
 ```
 
+<center>
 ![triads.png](triads.png)
+</center>
 
 ## Measure sd and mean for the average path lengths
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 agg1=with(res.all,aggregate(pls, by=list(model,iter), mean,na.rm=TRUE))
 agg2=with(res.all,aggregate(pls, by=list(model,iter), sd,na.rm=TRUE))
 agg3=with(res.all,aggregate(wls, by=list(model,iter), mean,na.rm=TRUE))
 agg4=with(res.all,aggregate(wls, by=list(model,iter), sd,na.rm=TRUE))
-head(agg1,n=20)
-head(agg2,n=20)
+head(agg1,n=10)
+head(agg2,n=10)
 agg=cbind(agg1,agg2$x,agg3$x,agg4$x)
 colnames(agg)=c('model','seasons','mean.apl','sd.apl','mean.wapl','sd.wapl')
 head(agg)
+write.table(agg,file="../inst/results/results.tab",sep="\t",quote=FALSE)
 ```
 
-
-```{r eval=FALSE}
-library(knitr)
-knitr::kable(agg)
-write.table(agg,file="path-lengths.tab",sep="\t",quote=FALSE)
+```{r eval=TRUE}
+if (file.exists(file.path("../inst/results/results.tab"))) {
+    agg=read.table("../inst/results/results.tab",header=TRUE,sep="\t")
+    library(knitr)
+    for (i in 3:6) {
+        agg[,i]=round(agg[,i],3)
+    }   
+    agg=agg[agg$model %in% c("gain","keystone","memory5","null"),]
+    knitr::kable(agg)
+    #write.table(agg,file="path-lengths.tab",sep="\t",quote=FALSE)
+} else {
+    print("results-file does not exists!")
+}
 ```
 
 
