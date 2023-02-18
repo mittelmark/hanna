@@ -107,6 +107,13 @@ dependend on the token, you can see in the left figure that no team does not
 only win and draw or does only loose and draw wheres the agent G in the
 winner/looser model does not loose any game.
 
+As comparison let's run the model where the agents remember the last five results and loosing often diminishs the current chance and wining often increases the chance.
+
+```{r}
+res=simul$season(LETTERS[1:6],model="memory",memory.length=5)
+res
+```
+
 ## Triads
 
 The `hgraph` object contains as well a method to count the triads in the graph:

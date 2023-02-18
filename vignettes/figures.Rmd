@@ -14,28 +14,28 @@ include-before: |
 
 ## Introduction
 
-Below you find the code for the paper ...
+Below you find the code for the figure for the paper of Hermanussen et. al.
+2023. Please keep in mind that Monte Carlo simulations will not produce always the same results. So the figures and the table at the end will vary alway a little bit, the general tendency however will be always the same.
 
-```{r}
-x=1
-print(x)
-```
+The principal approach is to let the agents play against each other, for this
+we need pairings of every against every one, like in a tournament. The simul$pairings function does just this, create pairings over several rounds.
 
-Season pairings:
+Here some season pairings for a small competition of four agens, A, B, C and D:
 
 ```{r}
 library(hanna)
 simul$pairings(LETTERS[1:4])
 ```
 
-Play a single round:
+This function is used internally to play these matches for a single round,
+season like this:
 
 ```{r}
 res=simul$season(LETTERS[1:6])
 res
 ```
 
-Let's now conver this to an undirected graph where edges are drawn between
+Let's now convert this to an undirected graph where edges are drawn between
 teams which draw against each other:
 
 ```{r}
@@ -43,7 +43,8 @@ U = simul$graph(res$M,mode='draw')
 U
 ```
 
-Now a directed graph where an edge is drawn from the winning team to the loosing team in a match.
+Now a directed graph where an edge is drawn from the winning team to the
+loosing team in a match, we can say the winner dominates the looser. We can visualize this using our helper module `hgraph`:
 
 ```{r fig.width=8,fig.height=4,out.width=1000}
 D = simul$graph(res$M,mode='win')
@@ -55,7 +56,12 @@ hgraph$plot(U)
 
 ## Model comparison
 
-```{r fig.width=14,fig.height=18,out.width=900,eval=TRUE}
+Please note, that due to the given seed the results will vary slightly, but
+the general tendency will be the same. The code below will repeat the seasons
+again and again taking the token from the last season into the new one, we run
+30 iterations, and after season 1, 5, 10 and 30 we draw the resulting graphs:
+
+```{r fig.width=14,fig.height=18,out.width=900,eval=FALSE}
 png("networks.png",width=900,height=900)
 set.seed(128)
 par(mfrow=c(4,4),mai=c(0.0,0.5,0.5,0.0))
@@ -109,6 +115,19 @@ dev.off()
 
 ## Triad counting
 
+What are the triads, so edge releations between tree connected nodes. We
+differentiate between:
+
+* double dominant (dd, for example A dominates B and C)
+* double subordinate (ds, for example A is dominated by B and C)
+* pass-along (pa, like A dominates B and B dominates C)
+* transitive (tr, A dominates B and C, and B dominates C
+* cycles (cy, here A dominates B, B dominates C, and then C dominates A)
+
+For more details look at the paper. Here the resulting triad counts after
+1,5,10 and 30 iterations, each time with 10 repetitions:
+
+
 ```{r fig.width=14,fig.height=14,out.width=800,eval=TRUE}
 set.seed(129) 
 png("triads.png",width=900,height=900)
@@ -155,18 +174,31 @@ dev.off()
 
 ## Measure sd and mean for the average path lengths
 
+We now determine the average path length converting the directed edges into
+undirected ones. We as well use a weighted path length where the path length
+is smaller for nodes with a high degree. The assumption is that high degree
+nodes are more important than low degree nodes and that transport of
+information over high degree nodes should be of higher prioriry.
+
+We use here the networks from the previous runs and aggregate the data from
+there. The code below is not evaluated every time the vignette is build as the
+simulation take a lot of time and so the data are pre computed to avoid delays
+in package installation.
+
 ```{r eval=TRUE}
 agg1=with(res.all,aggregate(pls, by=list(model,iter), mean,na.rm=TRUE))
 agg2=with(res.all,aggregate(pls, by=list(model,iter), sd,na.rm=TRUE))
 agg3=with(res.all,aggregate(wls, by=list(model,iter), mean,na.rm=TRUE))
 agg4=with(res.all,aggregate(wls, by=list(model,iter), sd,na.rm=TRUE))
-head(agg1,n=10)
-head(agg2,n=10)
+head(agg1,n=10) 
+head(agg2,n=10) 
 agg=cbind(agg1,agg2$x,agg3$x,agg4$x)
 colnames(agg)=c('model','seasons','mean.apl','sd.apl','mean.wapl','sd.wapl')
 head(agg)
 write.table(agg,file="../inst/results/results.tab",sep="\t",quote=FALSE)
 ```
+
+No we display the results, they were cached in previous runs:
 
 ```{r eval=TRUE}
 if (file.exists(file.path("../inst/results/results.tab"))) {
@@ -177,11 +209,12 @@ if (file.exists(file.path("../inst/results/results.tab"))) {
     }   
     agg=agg[agg$model %in% c("gain","keystone","memory5","null"),]
     knitr::kable(agg)
-    #write.table(agg,file="path-lengths.tab",sep="\t",quote=FALSE)
 } else {
     print("results-file does not exists!")
 }
 ```
+
+Gain is here the winner-looser model.
 
 
 

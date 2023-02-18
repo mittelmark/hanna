@@ -141,8 +141,11 @@ simul$season <- function (x,token=rep(length(x),length(x)),model='null',min.valu
         } else if (model == "memory") {
             #tokA=memory.length+sum(memory[[A]])
             #tokB=memory.length+sum(memory[[B]])
-            tokA=5+token[[A]]-memory[[A]][length(memory[[A]])]
-            tokB=5+token[[B]]-memory[[B]][length(memory[[B]])]
+            #tokA=5+token[[A]]-memory[[A]][length(memory[[A]])]
+            #tokB=5+token[[B]]-memory[[B]][length(memory[[B]])]
+            tokA=5+sum(memory[[A]]) # length(token)
+            tokB=5+sum(memory[[B]])
+            #token[[B]]-memory[[B]][length(memory[[B]])]
             smp=c(rep(A,tokA),rep(B,tokB)) 
         } else {
             if (token[A]> 0 & token[B] > 0) {
@@ -177,8 +180,10 @@ simul$season <- function (x,token=rep(length(x),length(x)),model='null',min.valu
         x[B,A]=res[2]
         if (model == "memory") {
             #res[1],
-            valA=c(token[[A]],memory[[A]])[1:memory.length]
-            valB=c(token[[B]],memory[[B]])[1:memory.length]
+            #valA=c(token[[A]],memory[[A]])[1:memory.length]
+            #valB=c(token[[B]],memory[[B]])[1:memory.length]
+            valA=c(res[1],memory[[A]])[1:memory.length]
+            valB=c(res[2],memory[[B]])[1:memory.length]
             memory[[A]]=valA
             memory[[B]]=valB
         }
@@ -359,7 +364,6 @@ simul$compare <- function (n=5,agents=12,seasons=3) {
             wl[wl==Inf]=2*max(wl[wl!=Inf])
             wl=mean(wl[upper.tri(wl)])
             wlengths=c(wlengths,wl)
-            recover()
             res.df=rbind(res.df,t(as.data.frame(unlist(hgraph$triads(simul$graph(res$M,mode="win"))))))
         }   
     }   
