@@ -28,6 +28,16 @@ To cite package 'hanna' in publications use:
   Monte Carlo simulations. R package version 0.1.
 
 ```
+## Documentation
+
+Here are the links to the package vignettes and the manual pages:
+
+* [vignette for the paper figures](https://mittelmark.github.io/R-docs/hanna/figures.html)
+* [vignette for the simul module](https://mittelmark.github.io/R-docs/hanna/simul-tutorial.html)
+* [vignette for the hgraph module](https://mittelmark.github.io/R-docs/hanna/hgraph-tutorial.html)
+* [manual pages](https://mittelmark.github.io/R-docs/hanna/help/index.html)
+
+
 ## Simulation
 
 If the installation was succesful, you can run a single season giving the
