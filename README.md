@@ -35,7 +35,7 @@ Here are the links to the package vignettes and the manual pages:
 * [vignette for the paper figures](https://mittelmark.github.io/R-docs/hanna/figures.html)
 * [vignette for the simul module](https://mittelmark.github.io/R-docs/hanna/simul-tutorial.html)
 * [vignette for the hgraph module](https://mittelmark.github.io/R-docs/hanna/hgraph-tutorial.html)
-* [manual pages](https://mittelmark.github.io/R-docs/hanna/help/index.html)
+* [manual pages](https://mittelmark.github.io/R-docs/hanna/help/00Index.html)
 
 
 ## Simulation
