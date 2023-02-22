@@ -1,4 +1,4 @@
-\name{simul$graph} 
+\name{simul$graph} %{{{ 
 \alias{simul$graph} 
 \alias{simul_graph} 
 \title{ Create a adjacency matrix out of the results for a match season. } 

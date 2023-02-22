@@ -1,4 +1,4 @@
-\name{hgraph$eccentricity} 
+\name{hgraph$eccentricity} %{{{ 
 \alias{hgraph$eccentricity} 
 \alias{hgraph_eccentricity} 
 \title{ Calculate the eccentricity centrality for all nodes. } 
@@ -25,3 +25,4 @@ hgraph$eccentricity(A)
 hgraph$eccentricity(A,mode="undireced") 
 } 
  
+%}}} 

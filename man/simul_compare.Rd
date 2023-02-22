@@ -1,4 +1,4 @@
-\name{simul$compare} 
+\name{simul$compare} %{{{ 
 \alias{simul$compare} 
 \alias{simul_compare} 
 \title{ Compare the different models for a certain number of seasons. } 

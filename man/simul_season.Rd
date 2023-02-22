@@ -1,4 +1,4 @@
-\name{simul$season} 
+\name{simul$season} %{{{ 
 \alias{simul_season} 
 \alias{simul$season} 
 \title{ Create matches for everyone against everyone using the given model. } 
@@ -9,7 +9,6 @@
 } 
 \usage{ `simul$season(x,token=rep(length(x),length(x)),model="null", 
                            min.value=4,memory=NULL,memory.length=1)` } 
- 
 \arguments{ 
   \item{x}{ vector of teams } 
   \item{token}{ vector of token for each team, which might influence the match outcone, depending on the given model, defaults: 5 } 

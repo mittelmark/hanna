@@ -13,3 +13,4 @@ VignetteBuilder: knitr
 License: MIT + file LICENSE
 NeedsCompilation: no
 Collate: hanna-package.R hgraph.R simul.R
+

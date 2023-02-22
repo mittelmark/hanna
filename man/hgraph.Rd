@@ -1,4 +1,4 @@
-\name{hgraph}  
+\name{hgraph} % {{{1  
 \alias{hgraph}  
 \alias{hgraph-class} 
 \title{ Environment object with utility functions to work with graphs.} 

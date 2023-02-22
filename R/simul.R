@@ -1,39 +1,34 @@
-# ' \docType{class}
-# ' \name{simul}
-# ' \alias{simul}
-# ' \alias{simul-class}
-# ' \title{ Environment obkject with functions do simulate winner-looser
-# effects. }
-# ' \description{
-# ' The functions within the simul environment perform simulations of
-# winner-looser
-# ' effects for the paper ...
-# ' }
-# ' \section{Methods}{
-# ' \itemize{
-# ' \item \code{\link[hanna:simul_compare]{simul$compare}} - compare the
-# different models
-# ' for a certain number of seasons
-# ' \item \code{\link[hanna:simul_graph]{simul$graph}} - create a adjacency
-# matrix out of the
-# ' results for a match season
-# ' \item \code{\link[hanna:simul_pairings]{simul$pairings}} - create round
-# pairings for a season
-# ' \item \code{\link[hanna:simul_season]{simul$season}} - create matches for
-# everyone
-# ' against everyone using the given model
-# '    }
-# ' }
-# '
-# ' \examples{
-# ' set.seed(124)
-# ' res=simul$season(LETTERS[1:6],model="null")
-# ' res
-# ' hgraph$plot(res$M)
-# ' } 
+# vim: set foldmethod=marker:
+
+#' \docType{class}  
+#' \name{simul} %{{{
+#' \alias{simul}
+#' \alias{simul-class}
+#' \title{ Environment obkject with functions do simulate winner-looser effects. }
+#' \description{
+#' The functions within the simul environment perform simulations of
+#' winner-looser effects for the paper ...
+#' }
+#' \section{Methods}{
+#' \itemize{
+#' \item \code{\link[hanna:simul_compare]{simul$compare}} - compare the different models for a certain number of seasons
+#' \item \code{\link[hanna:simul_graph]{simul$graph}} - create a adjacency matrix out of the results for a match season
+#' \item \code{\link[hanna:simul_pairings]{simul$pairings}} - create roundpairings for a season
+#' \item \code{\link[hanna:simul_season]{simul$season}} - create matches for everyone against everyone using the given model
+#' }
+#' }
+#' \examples{
+#' set.seed(124)
+#' res=simul$season(LETTERS[1:6],model="null")
+#' res
+#' hgraph$plot(res$M)
+#' } 
 
 simul=new.env()
-#' \name{simul$pairings}
+
+# }}}
+
+#' \name{simul$pairings} %{{{
 #' \alias{simul_pairings}
 #' \alias{simul$pairings}
 #' \title{ Create matching pairs everyone against every one. }
@@ -80,8 +75,9 @@ simul$pairings <- function (x) {
     }
     return(df)
 }
+# }}}
 
-#' \name{simul$season}
+#' \name{simul$season} %{{{
 #' \alias{simul_season}
 #' \alias{simul$season}
 #' \title{ Create matches for everyone against everyone using the given model. }
@@ -92,7 +88,6 @@ simul$pairings <- function (x) {
 #' }
 #' \usage{ `simul$season(x,token=rep(length(x),length(x)),model="null",
 #'                            min.value=4,memory=NULL,memory.length=1)` }
-#'
 #' \arguments{
 #'   \item{x}{ vector of teams }
 #'   \item{token}{ vector of token for each team, which might influence the match outcone, depending on the given model, defaults: 5 }
@@ -266,8 +261,9 @@ Simul_season2 <- function (x,memory=NULL,
     return(list(M=x,token=token,memory=memory))
 
 }
+#  }}}
 
-#' \name{simul$graph}
+#' \name{simul$graph} %{{{
 #' \alias{simul$graph}
 #' \alias{simul_graph}
 #' \title{ Create a adjacency matrix out of the results for a match season. }
@@ -307,9 +303,9 @@ simul$graph <- function (x,mode="draw") {
     }
     return(A)
 }
+# }}}
 
-
-#' \name{simul$compare}
+#' \name{simul$compare} %{{{
 #' \alias{simul$compare}
 #' \alias{simul_compare}
 #' \title{ Compare the different models for a certain number of seasons. }
@@ -399,8 +395,10 @@ simul$compare <- function (n=5,agents=12,seasons=3) {
     rownames(res.df)=1:nrow(res.df)
     return(res.df)
 }
+ 
+# }}}
 
-# private functions
+# private functions %{{{
 Simul_g2w <- function (x) {
     x[x<0]=0
     x[x>0]=1
@@ -416,3 +414,6 @@ Simul_g2w <- function (x) {
     }
     return(w)
 }
+
+# }}}
+

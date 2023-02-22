@@ -1,5 +1,5 @@
 #' \docType{class}
-#' \name{hgraph} 
+#' \name{hgraph} % {{{1 
 #' \alias{hgraph} 
 #' \alias{hgraph-class}
 #' \title{ Environment object with utility functions to work with graphs.}
@@ -36,9 +36,12 @@
 #' hgraph$shortest_paths(A,mode="undirected")
 #' }
 
+
 hgraph=new.env()
 
-#' \name{hgraph$eccentricity}
+# }}}
+
+#' \name{hgraph$eccentricity} %{{{
 #' \alias{hgraph$eccentricity}
 #' \alias{hgraph_eccentricity}
 #' \title{ Calculate the eccentricity centrality for all nodes. }
@@ -65,6 +68,7 @@ hgraph=new.env()
 #' hgraph$eccentricity(A,mode="undireced")
 #' }
 #' 
+#' %}}}
 
 hgraph$eccentricity <- function (x,mode="directed", unconnected=FALSE, infinite=NULL) {
     self=hgraph
