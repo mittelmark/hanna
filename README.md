@@ -10,7 +10,7 @@ library(remotes)
 remotes::install_github("https://github.com/mittelmark/hanna")
 ```
 
-Therafter you can check the installation like this:
+Thereafter you can check the installation like this:
 
 ```
 library(hanna)
@@ -31,7 +31,7 @@ To cite package 'hanna' in publications use:
 
 ## Simulation
 
-If the installation was succesful, you can run a single season giving the
+If the installation was successful, you can run a single season giving the
 agents as many tokens as there are agents in the game using the default null model like this:
 
 ```
@@ -55,7 +55,7 @@ agents as many tokens as there are agents in the game using the default null mod
 The token does represent the overall win and loosing points, so for instance A
 has won 2 times and lost 1 time so it has 6+2-1 token remaining, it is 7. In
 the null model win/loose changes are independent from the number of tokens. To
-use other models consult the help page from ?simul_season. More details are as
+use other models consult the help page from `?simul_season`. More details are as
 well shown in the package vignette which you can read usually by writing
 `vignette('simul-tutorial')` in your R console.
 

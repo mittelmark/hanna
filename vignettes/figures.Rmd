@@ -15,12 +15,12 @@ include-before: |
 ## Introduction
 
 Below you find the code for the figure for the paper of Hermanussen et. al.
-2023. Please keep in mind that Monte Carlo simulations will not produce always the same results. So the figures and the table at the end will vary alway a little bit, the general tendency however will be always the same.
+2023. Please keep in mind that Monte Carlo simulations will not produce always the same results. So the figures and the table at the end will vary always a little bit, the general tendency however will be always the same.
 
 The principal approach is to let the agents play against each other, for this
-we need pairings of every against every one, like in a tournament. The simul$pairings function does just this, create pairings over several rounds.
+we need pairings of every against every one, like in a tournament. The `simul$pairings` function does just this, create pairings over several rounds.
 
-Here some season pairings for a small competition of four agens, A, B, C and D:
+Here some season pairings for a small competition of four agents, A, B, C and D:
 
 ```{r}
 library(hanna)
@@ -115,7 +115,7 @@ dev.off()
 
 ## Triad counting
 
-What are the triads, so edge releations between tree connected nodes. We
+What are the triads, so edge relations between tree connected nodes. We
 differentiate between:
 
 * double dominant (dd, for example A dominates B and C)
@@ -178,7 +178,7 @@ We now determine the average path length converting the directed edges into
 undirected ones. We as well use a weighted path length where the path length
 is smaller for nodes with a high degree. The assumption is that high degree
 nodes are more important than low degree nodes and that transport of
-information over high degree nodes should be of higher prioriry.
+information over high degree nodes should be of higher priority.
 
 We use here the networks from the previous runs and aggregate the data from
 there. The code below is not evaluated every time the vignette is build as the

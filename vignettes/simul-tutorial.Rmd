@@ -27,7 +27,9 @@ The simul environment provides the following methods:
 
 ## Pairings
 
-This just allows to create matches where in every round the agents get a new partner, here an example for a small group of 6 agents giving all together 15 matches:
+This just allows to create matches where in every round the agents get a new
+partner, here an example for a small group of 6 agents giving all together 15
+matches:
 
 ```{r}
 library(hanna)
@@ -51,8 +53,8 @@ res$token
 res$M
 ```
 
-A -1 in the matrix means a loss, a 1 a win, where you must read rowwise. So
-for instance A was loosing agains B in this season. The number of tokens is
+A -1 in the matrix means a loss, a 1 a win, where you must read row-wise. So
+for instance A was loosing against B in this season. The number of tokens is
 directly related to the number of wins and losses after a single season. We
 can use the token to create a new season with non-equal starting conditions.
 
@@ -65,8 +67,8 @@ res2$M
 Using the null model there should be no big changes after the iterations as
 the chance to win or loose is not dependent on the current amount of tokens.
 Let's do a loop over ten seasons, each time sending the current number of
-tokens into the next iteration and let us compare this with the gain modelm
-the winner-looser model where the chance to win or loose is dependend on the
+tokens into the next iteration and let us compare this with the gain model
+the winner-looser model where the chance to win or loose is dependent on the
 current number of token:
 
 ```{r}
@@ -83,7 +85,7 @@ res.gain$token
 
 As you can see the amount of token in the gain model is less balanced than
 that in the null mode. Let's plot the resulting graphs side by side. For this
-we use the hgraph module which offers a view utility functions to work with
+we use the `hgraph` module which offers a view utility functions to work with
 graphs:
 
 
@@ -100,14 +102,16 @@ hgraph$plot(A.gain,vertex.color=cols)
 mtext(side=3,"winlose",cex=2)
 ```
 
-In red color are agents which does not loose any gaim, in blue are agents
+In red color are agents which does not loose any game, in blue are agents
 which does not win any game, in grey are agents displayed which win or lost at
 least one game each. As in the null model the chances to win and loose are not
-dependend on the token, you can see in the left figure that no team does not
+dependent on the token, you can see in the left figure that no team does not
 only win and draw or does only loose and draw wheres the agent G in the
 winner/looser model does not loose any game.
 
-As comparison let's run the model where the agents remember the last five results and loosing often diminishs the current chance and wining often increases the chance.
+As comparison let's run the model where the agents remember the last five
+results and loosing often diminishes the current chance and wining often
+increases the chance.
 
 ```{r}
 res=simul$season(LETTERS[1:6],model="memory",memory.length=5)
@@ -123,7 +127,7 @@ unlist(hgraph$triads(A.null))
 unlist(hgraph$triads(A.gain))
 ```
 
-Let's visualue the numbers in percentages for these single runs in a dotchart
+Let's visualize the numbers in percentages for these single runs in a dotchart
 diagram.
 
 ```{r fig.width=9,fig.height=6,out.width=800}
