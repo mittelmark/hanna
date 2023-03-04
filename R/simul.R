@@ -28,6 +28,7 @@ simul=new.env()
 
 # }}}
 
+
 #' \name{simul$pairings} %{{{
 #' \alias{simul_pairings}
 #' \alias{simul$pairings}
