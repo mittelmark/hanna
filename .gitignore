@@ -4,3 +4,7 @@
 *Rcheck*
 .Rhistory
 .RData
+*.swp
+*.swo
+*.zip
+tags

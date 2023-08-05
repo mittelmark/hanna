@@ -7,7 +7,7 @@
          vertex.size=1, vertex.labels=NULL, vertex.color="grey80", 
          vertex.cex=1, vertex.pch=19, 
          edge.color="grey40", edge.lty=1, edge.text=NULL, edge.cex=1, 
-         edge.pch=0, edge.lwd=3,weighted=FALSE, 
+         edge.pch=0, edge.lwd=3,arrows=TRUE,weighted=FALSE, 
          star.center=NULL,...)` 
 } 
 \description{ 
@@ -29,6 +29,7 @@
   \item{edge.cex}{optional character expansion for the edge label and the underlying plotting character, default: 1} 
   \item{edge.pch}{optional character code for the edge.text, default: 0} 
   \item{edge.lwd}{the line width for the edges} 
+  \item{arrows}{should edges been show in case graph is directed, default: TRUE} 
   \item{weighted}{should the edges be shown with different weights given within the adjacency matrix} 
   \item{star.center}{for layout 'star' the central node, default: NULL} 
   \item{\ldots}{arguments delegated to the plot function} 
