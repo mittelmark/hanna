@@ -55,7 +55,7 @@ hgraph-tutorial         hgraph introduction (source, html)
 
 > ### Let's load one vignette from this package
 > vignette("figures",package="hanna")
-
+```
 
 ## Simulation
 
