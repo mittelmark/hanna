@@ -107,6 +107,7 @@ simul$pairings <- function (x) {
 #'      \item{token}{vector of current tokens for each team}
 #'      \item{model}{the choosen model}
 #'      \item{memory}{list with last results for each agent}
+#'      \item{game.prob}{matrix of probabilities for performing a game between two items}
 #'   }
 #' }
 #' \examples{
@@ -116,7 +117,7 @@ simul$pairings <- function (x) {
 #' }
 #' 
 
-simul$season <- function (x,token=rep(length(x),length(x)),model='null',min.value=4,memory=NULL,memory.length=1) {
+simul$season <- function (x,token=rep(length(x),length(x)),model='null',min.value=4,memory=NULL,memory.length=1,game.prob=NULL) {
     pairings=simul$pairings(x)
     if (class(memory) == "NULL") {
         memory=lapply(x,function(x) { return(rep(0,memory.length+1)) })
@@ -127,9 +128,29 @@ simul$season <- function (x,token=rep(length(x),length(x)),model='null',min.valu
     x=matrix(0,nrow=length(x),ncol=length(x))
     rownames(x)=colnames(x)=nms
     vec=rownames(x)
+    if (is.matrix(game.prob)) {
+        p=apply(pairings,1,function(x)  { return(game.prob[x[2],x[3]]) })
+        idx=which(rbinom(length(p),1,p=p)==1)
+        pairings=pairings[idx,]
+    }
     for (i in 1:nrow(pairings)) {
         A=pairings[i,2]
         B=pairings[i,3]
+        #        if (is.matrix(game.prob)) {
+        #            p=game.prob[A,B]
+        #            if (p > 0) {
+        #                g=rbinom(1,1,prob=p)
+        #            } else {
+        #                g = 0
+        #            }
+        #                
+        #            if (g == 0) {
+        #                res=c(0,0)
+        #                x[A,B]=res[1]
+        #                x[B,A]=res[2]
+        #                next
+        #            }
+        #        }
         if (model=="null") {
             smp=c(rep(A,length(nms)),rep(B,length(nms)))
         } else if (model == "chance") {
@@ -318,7 +339,7 @@ simul$graph <- function (x,mode="draw") {
 #' \arguments{
 #'   \item{n}{ how many repeats per model, default: 5}
 #'   \item{agents}{how many agents/teams, default: 12} 
-#'   \item{seasons}{ow many seasons, default: 3}
+#'   \item{seasons}{how many seasons, default: 3}
 #' }
 #' 
 #' \value{data frame with the results, last column model type}
@@ -398,6 +419,245 @@ simul$compare <- function (n=5,agents=12,seasons=3) {
 }
  
 # }}}
+
+### New functions for release 0.2.0
+
+#' \name{simul$getProbMatrix} %{{{
+#' \alias{simul_getProbMatrix}
+#' \alias{simul$getProbMatrix}
+#' \title{ Get a probability matrix for games between agents. }
+#' \description{
+#'   This function returns a probability matrix for a certain number of agents
+#'   to express the probabilty that they are matched in a game.
+#' }
+#' \usage{ `simul$getProbMatrix(n,sd=1,mode='a')` }
+#'
+#' \arguments{
+#'   \item{n}{ number of agents }
+#'   \item{sd}{ data scatter for creating the probabilities, default: 1}
+#'   \item{mode}{which type of pattern to create, 'a' is based on a simple norm distribution, 'norm' is a two-dimensional normal distribution, 'unif' whill give an uniform distribution, default: 'a'}
+#' }
+#' \value{list with the two components:
+#'   'P' - probability matrix,
+#'   'layout' - two dimensional layout to plot the points}
+#' \examples{
+#' res=simul$getProbMatrix(6)
+#' round(res$P,2)
+#' round(res$layout,2)
+#' }
+#' 
+simul$getProbMatrix  <- function (n,sd=1,mode='a') {  
+    P = matrix(0,nrow=n,ncol=n); 
+    if (mode == 'a') {    
+        rn=rnorm(10000,sd=sd)
+        rn=rn[rn>0]
+        rn=rn/max(rn)
+    } else {
+        if (mode == "norm") {
+            x=rnorm(n,sd=sd)
+            y=rnorm(n,sd=sd)
+        } else {
+            x=runif(n)
+            y=runif(n)
+        }
+        M=data.frame(x=x,y=y)
+        rownames(M)=simul$getNames(n)
+        D=as.matrix(dist(M))
+        D=D/max(D)
+        P=1-D
+        P=P^2
+        return(list(P=P,layout=M))
+    }
+    v=sample(rn,(n*n-n)/2)
+    P[upper.tri(P)]=v; 
+    P[lower.tri(P)]=t(P)[lower.tri(P)]; 
+    colnames(P)=rownames(P)=simul$getNames(n)
+    lay=cmdscale(as.dist(1-P))
+    return(list(P=P,layout=lay)); 
+}
+
+#' \name{simul$getNames} %{{{
+#' \alias{simul_getNames}
+#' \alias{simul$getNames}
+#' \title{ Get automatic node names for a certain number of items. }
+#' \description{
+#'   This function returns names for a certain number of items to be shown
+#'   for instance in a graph.
+#' }
+#' \usage{ `simul$getNames(n)` }
+#'
+#' \arguments{
+#'   \item{n}{ number of agents }
+#' }
+#' \value{character vector with names }
+#' \examples{
+#' simul$getNames(26)
+#' head(simul$getNames(100))
+#' }
+#' 
+
+simul$getNames <- function (n) {
+    if (n <= 26) {
+        return(LETTERS[1:n])
+    } else if (n < 101) {
+        return(paste(rep(LETTERS[1:26],4),rep(1:4,each=26),sep="")[1:n])
+    } else if (n < 520) {
+        return(paste(rep(LETTERS[1:26],9),rep(1:20,each=26),sep="")[1:n])
+    } else if (n < 10000) {
+        return(sprintf("%04i",n))
+    } else {
+        return(sprintf("%06i",n))
+    }
+}
+
+#' \name{simul$gini} %{{{
+#' \alias{simul_gini}
+#' \alias{simul$gini}
+#' \title{ Gini coefficient }
+#' \description{
+#'   Returns the Gin coefficient for inequality, where 1 is the highest possible inequality 
+#'   and zero is total equality.
+#' }
+#' \usage{ `simul$gini(x)` }
+#'
+#' \arguments{
+#'   \item{x}{ vector with numerical vectorss }
+#' }
+#' \value{computed Gini coefficient }
+#' \examples{
+#' simul$gini(c(1,2,3,4,10))
+#' simul$gini(c(1,1,1,1,1))
+#' }
+#' 
+
+### https://github.com/oliviaguest/gini/blob/master/gini.py
+simul$gini <- function (x) { 
+    x = x-min(x)+0.00001; 
+    x=sort(x); 
+    n=length(x); 
+    index=1:n; 
+    return((sum((2*index-n-1)*x)) / (n*sum(x))) 
+}
+
+#' \name{simul$gridAgents}
+#' \alias{simul_gridAgents}
+#' \alias{simul$gridAgents}
+#' \title{ Grid layout of nodes in a network with some noise }
+#' \description{
+#'   Returns coordinates for a certain nuber of nodes in a regular grid with some added noise to 
+#'   to improve visibility of edges between nodes.
+#' }
+#' \usage{ `simul$gridAgents(x)` }
+#'
+#' \arguments{
+#'   \item{x}{ grid dimension, given value x will create x * x network of coordinates }
+#' }
+#' \value{computed Gini coefficient }
+#' \examples{
+#' round(simul$gridAgents(4),2)
+#' }
+#' 
+simul$gridAgents <- function (x=10) {
+    n=x
+    lay=matrix(0,nrow=n*n,ncol=2)
+    colnames(lay)=c('x','y')
+    for (i in 1:n) {
+        for (j in 1:n) {
+            x=rnorm(1,mean=i,sd=0.1)
+            y=rnorm(1,mean=j,sd=0.1)
+            lay[(i*n)-n+j,'x']=x
+            lay[(i*n)-n+j,'y']=y
+        }
+    }   
+    return(lay)
+}
+
+#' \name{simul$gompertz}
+#' \alias{simul_gompertz}
+#' \alias{simul$gompertz}
+#' \title{ Gompertz function }
+#' \description{
+#'   Returns values for the given vector according to the Gompertz function.
+#' }
+#' \usage{ `simul$gompertz(x, a=1, b=0.5, c=0.2)` }
+#'
+#' \arguments{
+#'   \item{x}{given x values}
+#'   \item{a}{asymptote, default: 1}
+#'   \item{b}{displacment on x, default: -0.5} 
+#'   \item{c}{growth rate, default: 0.2}
+#' }
+#' \value{computed Gompertz values }
+#' \examples{
+#' simul$gompertz(1:5)
+#' plot(simul$gompertz(1:20,a=-1,b=50,c=1.5))
+#' }
+#' 
+
+simul$gompertz <- function(x, a=1, b=0.5, c=0.2) {
+  # Calculate the Gompertz function value for each input value
+  y <- a * exp(-b * exp(-c * x))
+  return(y)
+}
+
+#' \name{simul$d2prob}
+#' \alias{simul_d2prob}
+#' \alias{simul$d2prob}
+#' \title{ Convert distances between points to probabilities using Gompertz function }
+#' \description{
+#'   This function calculates for the given coordinates probability values
+#'   using the Gompertz function.
+#' }
+#' \usage{ `simul$d2prob(x, b=50, c=1.5)` }
+#'
+#' \arguments{
+#'   \item{x}{given x values}
+#'   \item{b}{displacment value for the Gompertz function, default: 50} 
+#'   \item{c}{growth rate value for the Gompertz function, default: 1.5}
+#' }
+#' \value{matrix of probability values based on Gompertz function }
+#' \examples{
+#' res=simul$gridAgents()
+#' plot(res,pch=19,cex=2,col="blue")
+#' P=simul$d2prob(res)
+#' round(P,2)[1:14,1:14]
+#' }
+#' 
+
+simul$d2prob <- function (x,b=50,c=1.5) {
+    D = as.matrix(dist(x))
+    P = D
+    P[] = 1+simul$gompertz(D,a=-1,b=b,c=c)
+    return(P)
+}
+
+#' \name{simul$prob2game}
+#' \alias{simul_prob2game}
+#' \alias{simul$prob2game}
+#' \title{ Convert probabilities matrices to 0 and 1 matrices }
+#' \description{
+#'   This function takes a given probability matrix and concerts it
+#'   to a binary matrix where 0 means no game between agents and 1 
+#'   means a game should be performed between the agents.
+#' }
+#' \usage{ `simul$prob2game(p)` }
+#' \arguments{
+#'   \item{p}{matrix of probabilities}
+#' }
+#' \value{binary matrix, diagonal values are all zero}
+#' \examples{
+#' res=simul$gridAgents()
+#' P=simul$d2prob(res)
+#' G=simul$prob2game(P)
+#' G[1:14,1:14]
+#' }
+#' 
+simul$prob2game <- function (p) {
+    g=p
+    g[]=rbinom(length(p),1,prob=p)
+    diag(g)=0
+    return(g)
+}
 
 # private functions %{{{
 Simul_g2w <- function (x) {
