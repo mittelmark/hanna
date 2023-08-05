@@ -1,7 +1,7 @@
 ---
 title: "Hermanussen et. al. (2023) - Paper figures"
 author: Detlef Groth, University of Potsdam, Germany
-date: 2023-02-05
+date: 2023-08-05
 output: function () { rmarkdown::html_vignette(toc=TRUE,css="style.css") }
 vignette: >
   %\VignetteIndexEntry{Hermanussen et. al. (2023) - Paper figures}
@@ -44,7 +44,7 @@ U
 ```
 
 Now a directed graph where an edge is drawn from the winning team to the
-loosing team in a match, we can say the winner dominates the looser. We can visualize this using our helper module `hgraph`:
+losing team in a match, we can say the winner dominates the loser. We can visualize this using our helper module `hgraph`:
 
 ```{r fig.width=8,fig.height=4,out.width=1000}
 D = simul$graph(res$M,mode='win')
@@ -61,8 +61,9 @@ the general tendency will be the same. The code below will repeat the seasons
 again and again taking the token from the last season into the new one, we run
 30 iterations, and after season 1, 5, 10 and 30 we draw the resulting graphs:
 
-```{r fig.width=14,fig.height=18,out.width=900,eval=FALSE}
+```{r label=model-compare,fig.width=14,fig.height=18,out.width=900,eval=TRUE}
 png("networks.png",width=900,height=900)
+#pdf("networks.pdf",width=12,height=12)
 set.seed(128)
 par(mfrow=c(4,4),mai=c(0.0,0.5,0.5,0.0))
 colors=c('grey80','#ff9999','#bb5555')
@@ -88,20 +89,24 @@ for (mode in c('null','memory5','gain','keystone')) {
                 res=simul$season(LETTERS[1:12],token=res$token,model=mode)
             }
         }  
-        D = simul$graph(res$M,mode='win') 
-        cols=hgraph$colors(D,col=colors)
         if (i %in% c(1,5,10,30)) {
+            D = simul$graph(res$M,mode='win') 
+            #cols=hgraph$colors(D,col=colors)
+            cols=rep("grey80",length(res$token))
+            cols[res$token<2]="skyblue"
+            cols[res$token>9]="salmon"
+            cols[res$token>20]="red"
             hgraph$plot(D,vertex.color=cols,vertex.size=0.8)
             if (i == 1) {
                 if (mode == "gain") {
-                   mtext("winlose",side=2,cex=1.5,line=0)
+                   mtext("winner-loser",side=2,cex=1.8,line=1)
                 } else {
-                    mtext(mode,side=2,cex=1.5,line=0)
+                    mtext(mode,side=2,cex=1.8,line=1)
                 }   
             }
         
             if (mode == "null") {
-                mtext(i,side=3,line=0,cex=1.5)
+                mtext(paste("season",i),side=3,line=0,cex=1.8)
             }
         }
     }   
@@ -128,9 +133,10 @@ For more details look at the paper. Here the resulting triad counts after
 1,5,10 and 30 iterations, each time with 10 repetitions:
 
 
-```{r fig.width=14,fig.height=14,out.width=800,eval=TRUE}
+```{r label=write-triads-png,fig.width=14,fig.height=14,out.width=800,eval=TRUE}
 set.seed(129) 
 png("triads.png",width=900,height=900)
+#pdf("triads.pdf",width=12,height=12)
 par(mfcol=c(4,4),omi=c(0.5,0.7,0.5,0.3),mai=rep(0.2,4))  
 for (i in c(1,5,10,30)) {
     res.df=simul$compare(n=10,seasons=i) 
@@ -138,25 +144,25 @@ for (i in c(1,5,10,30)) {
        #rest=t(scale(t(res.df[res.df$model==mod,1:5]))) 
        rest=t(apply(res.df[res.df$model==mod,1:5],1,function(x) { (x/sum(x))*100} ))
        #rest=cbind(rest,res.df[,6])
-       boxplot(rest,ylim=c(0,100),axes=FALSE) 
+       boxplot(rest,ylim=c(0,100),axes=FALSE,cex.axes=2) 
        lines(1:5,apply(rest,2,median)) 
        if (i == 1) {
           if (mod == "gain") {
-            mtext("winlose",side=2,cex=1.5,line=3)
+            mtext("winner-loser",side=2,cex=1.8,line=4)
           } else {
-            mtext(mod,side=2,cex=1.5,line=3)
+            mtext(mod,side=2,cex=1.8,line=4)
           }
        }
        box()
        if (mod == "null") {
-           mtext(i,side=3,cex=1.5,line=3)
+           mtext(paste("season",i),side=3,cex=1.8,line=2)
        }
        if (i == 1) {
-             axis(2,cex.axis=1.5)
+             axis(2,cex.axis=2)
 
        }
        if (mod == "keystone") {
-         axis(1,labels=colnames(rest),at=1:5,cex.axis=1.5)
+         axis(1,labels=colnames(rest),at=1:5,cex.axis=2)
        }
         if (i == 1 & mod == "null") {
             res.all=cbind(res.df,iter=rep(i,nrow(res.df)))
@@ -185,7 +191,7 @@ there. The code below is not evaluated every time the vignette is build as the
 simulation take a lot of time and so the data are pre computed to avoid delays
 in package installation.
 
-```{r eval=TRUE}
+```{r label=aggregates,eval=TRUE}
 agg1=with(res.all,aggregate(pls, by=list(model,iter), mean,na.rm=TRUE))
 agg2=with(res.all,aggregate(pls, by=list(model,iter), sd,na.rm=TRUE))
 agg3=with(res.all,aggregate(wls, by=list(model,iter), mean,na.rm=TRUE))
@@ -200,7 +206,7 @@ write.table(agg,file="../inst/results/results.tab",sep="\t",quote=FALSE)
 
 No we display the results, they were cached in previous runs:
 
-```{r eval=TRUE}
+```{r label=write-table,eval=TRUE}
 if (file.exists(file.path("../inst/results/results.tab"))) {
     agg=read.table("../inst/results/results.tab",header=TRUE,sep="\t")
     library(knitr)
@@ -214,8 +220,235 @@ if (file.exists(file.path("../inst/results/results.tab"))) {
 }
 ```
 
-Gain is here the winner-looser model.
+Gain is here the winner-loser model.
+
+## Comparing full matching model (12 nodes) with distance based matching (16 nodes)
+
+```{r label=graphplots,eval=TRUE}
+run = function (n,iter=3,sd=1,mode="a",model="null",prob="random",b=15,c=1.5,plot=TRUE) {
+    if (prob=="random") {
+        P=simul$getProbMatrix(n,sd=sd,mode=mode)
+        lay=P$layout
+        P=P$P
+    } else if (prob=="all") {
+        P=matrix(1,nrow=n,ncol=n)
+        diag(P)=0
+        rownames(P)=colnames(P)=simul$getNames(n)
+        lay="circle"
+    } else if (prob == "landscape") {
+        lay=simul$gridAgents(n)
+        P=simul$d2prob(lay,b=b,c=c)
+        P[P<0.01]=0
+        colnames(P)=rownames(P)=simul$getNames(n*n)
+        n=n*n
+    }   
+    for (i in 1:iter) {
+        if (i == 1) {
+            res=simul$season(simul$getNames(n),token=rep(5,n),game.prob=P,model=model)
+        } else {
+            res=simul$season(simul$getNames(n),token=res$token,game.prob=P,model=model)
+        }   
+        if (i == 1 || i == 5 || i == 10 || i == iter) {
+            g=simul$graph(res$M,mode="win")
+            if (i == 1) {
+                df=t(data.frame(unlist(hgraph$triads(g))))
+            } else {
+                df=rbind(df,t(data.frame(unlist(hgraph$triads(g)))))
+            }   
+            cols=rep("grey80",ncol(res$M))
+            cols[res$token>9] = "salmon"
+            cols[res$token<2] = "skyblue"
+            cols[res$token>20] = "red"
+            ts=sort(res$token)
+            topn=round(sum(ts[1:as.integer(n/10)])/sum(ts),2)
+            if (plot) {
+                tok=cut(res$toke,c(0,1,9,20,4000),include.lowest=TRUE)
+                levels(tok)=c("0..1","2..9","10..20",">20")
+                barplot(prop.table(table(tok)),col=c('skyblue','grey80','salmon','red'),ylim=c(0,1),
+                    cex.axis=1.4,cex.lab=1.8,ylab="proportion",xlab="token ranges",cex.names=1.3)
+                mtext(side=3,text=paste("season",i),cex=1.5)
+                opar=par(mai=rep(0.1,4))
+                hgraph$plot(g,layout=lay,vertex.color=cols,vertex.size=0.5,arrows=FALSE,edge.lwd=1);
+                hgraph$plot(g,layout='sam',vertex.color=cols,vertex.size=0.5,arrows=FALSE,edge.lwd=1);
+                par(opar)  
+            }   
+
+        }
+
+    }
+    res$layout=lay
+    res$triads=df
+    invisible(res)
+}
+triads=NULL
+mod=list("win"="winner-loser",
+        "null"="null")
+for (r in c(12,4)) {
+    for (model in c("null","win")) {
+        png(paste("simul-new-n-",r,"-",model,".png",sep=""),width=1200,height=900)
+        par(mfcol=c(3,4),mai=c(0.7,0.7,0.6,0.0),omi=c(0.3,0.4,0.7,0.1))
+         for (i in 1:5) {
+             if (i == 1) {
+                 plot=TRUE
+             } else {
+                plot=FALSE  
+             }
+             if (r == 12) {
+                 g.triadi=run(n=r,iter=30,prob="all",model=model,plot=plot,c=1.5)$triads
+             } else {
+                 g.triadi=run(n=r,iter=30,prob="landscape",model=model,plot=plot,c=1.5)$triads
+             }
+             g.triadi=cbind(g.triadi,n=rep(r,nrow(g.triadi)))   
+             rownames(g.triadi)=paste(model,c("01","05","10","30"),sep="")
+             if (i == 1 & r == 12 & model == "null") {
+                if (is.matrix(triads)) {
+                    g.triad=triads
+                    g.triad=rbind(g.triad,g.triadi)
+                } else {
+                    g.triad=g.triadi
+                }
+             } else {
+                g.triad=rbind(g.triad,g.triadi)
+             }
+             if (plot) {
+                mtext(side=3,text=mod[[model]],outer=TRUE,cex=2,line=-1)
+             }
+         }
+         dev.off()
+    }   
+}
+```
+
+## Everyone against every one playing each round with 12 nodes
+
+In the  following  the  arrows are taken away to give a better  view.  Usually
+arrows  point from red to grey or blue. Blue are shown  agents  with zero or 1
+token, grey are shown  agents  with 2 to 9 tokens and light red agents with 10
+to 20 nodes. Shown are either null models or the winner-loser  model where the
+game win in a pairing depends on the number of token.
 
 
+![](simul-new-n-12-null.png)
 
+![](simul-new-n-12-win.png)
+
+
+## Matches based on distances in the grid with 16 nodes
+
+In these  examples 12 agents were in a contest and the  probability of a match
+between two agents depends on the Euclidean  distance  between the nodes where
+the conversion into a probability is based on a Gompertz function.
+
+![](simul-new-n-4-null.png)
+
+![](simul-new-n-4-win.png)
+
+## Triad box-plots 
+
+```{r label="boxplot",fig.width=9,fig.height=6}
+par(mfcol=c(2,4),mai=c(0.5,0.6,0.5,0.1),omi=c(0.5,0.5,0.8,0.2)); 
+##triads=readRDS("triad.RDS")
+triads=g.triad
+for (n in c(12,4)) { 
+    idx0=which(triads[,'n']==n)
+    model=gsub("^([a-z]+)[0-9]+","\\1",rownames(triads[idx0,1:5]))
+    iter=gsub("^150?","",gsub("[a-z]+0?","",rownames(triads[idx0,1:5])))
+    for (i in c("1","5","10","30")) { 
+        for (j in c("null","win")) { 
+            sset=triads[idx0,1:5]
+            idx = which(iter==i & model==j) ; 
+            if (n == 12) {
+                boxplot(sset[idx,],ylim=c(0,130),cex.axis=1.6,cex.lab=1.4); 
+            } else if (n == 4) {
+                boxplot(sset[idx,],ylim=c(0,250),cex.axis=1.6,cex.lab=1.4); 
+            } else if (n == 10) {
+                boxplot(sset[idx,],ylim=c(0,8000),cex.axis=1.6,cex.lab=1.4); 
+            } else  {
+                boxplot(sset[idx,],ylim=c(0,35000),cex.axis=1.6,cex.lab=1.4);   
+            }
+            grid()
+            if (j == "null") {
+                mtext(paste("season =",i),side=3,line=2,cex=1.5)
+            }
+            if (i == "1") {
+                mtext(paste("model =",mod[[j]]),side=2,line=3,cex=1.5)
+            }
+        } 
+    }
+    t=n
+    if (n != 12) {
+        t=n*n
+    }
+    mtext(side=3,paste("nodes:",t),cex=2,line=1,outer=TRUE)
+}
+```
+
+## Gompertz function
+
+Here some  examples how to translate  the grid  structure of the agents into a
+Gompertz based probability.
+
+```{r  fig.width=9,fig.height=6,fig.cap="Gompertz  function  and grid layout of competing agents"}
+par(mfrow=c(1,2))
+plot(0:20,simul$gompertz(0:20,a=-1,b=50,c=1.5),type='l')
+res=simul$gridAgents()
+plot(res,pch=19,cex=2,col="blue")
+
+P=simul$d2prob(res)
+round(P,2)[1:14,1:14]
+G=simul$prob2game(P)
+G[1:14,1:14]
+summary(apply(G,1,sum))
+P=simul$d2prob(res,b=15,c=1.5)
+round(P,2)[1:14,1:14]
+G=simul$prob2game(P)
+G[1:14,1:14]
+summary(apply(G,1,sum))
+```
+
+
+## Number of Neighbors
+
+How many neighbors are agents matched against:
+
+```{r}
+countNeighbors <- function (n,b=15,c=1.5) {
+    res=simul$gridAgents(n)
+    P=simul$d2prob(res,b=b,c=c)
+    P[P<0.01]=0
+    g=rbinom(length(P[upper.tri(P)]),1,p=P[upper.tri(P)])
+    P[upper.tri(P)]=g
+    P[lower.tri(P)]=t(P)[lower.tri(P)]
+    diag(P)=0
+    return(list(mean=mean(apply(P,1,sum)),sd=sd(apply(P,1,sum))))
+}
+
+df=NULL
+for (c in c(1.0,1.5)) {
+    for (n in c(4,10,20)) {
+        for (i in 1:10) {
+            res=countNeighbors(n,c=c)
+            if (!is.data.frame(df)) {
+                df=data.frame(c=c,n=n,mean=res$mean,sd=res$sd)     
+            } else {
+                df=rbind(df,data.frame(c=c,n=n,mean=res$mean,sd=res$sd))
+            }
+        }   
+    }
+}
+```
+
+Now the result:
+
+```{r results="asis"}
+library(knitr)
+agg=aggregate(df[,3:4],by=list(df$c,df$n),FUN=mean)
+agg$mean = round(agg$mean,2)
+agg$sd   = round(agg$sd,2)
+colnames(agg)[1]="c"
+colnames(agg)[2]="n"
+kable(agg,caption="Table: Averages for 10 runs")
+```
+
+The column c represents the Gompertz c, n is the grid size, which is `n x n`.
 
