@@ -584,7 +584,7 @@ hgraph$layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interacti
 #'          vertex.size=1, vertex.labels=NULL, vertex.color="grey80",
 #'          vertex.cex=1, vertex.pch=19,
 #'          edge.color="grey40", edge.lty=1, edge.text=NULL, edge.cex=1,
-#'          edge.pch=0, edge.lwd=3,weighted=FALSE,
+#'          edge.pch=0, edge.lwd=3,arrows=TRUE,weighted=FALSE,
 #'          star.center=NULL,...)`
 #' }
 #' \description{
@@ -606,6 +606,7 @@ hgraph$layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interacti
 #'   \item{edge.cex}{optional character expansion for the edge label and the underlying plotting character, default: 1}
 #'   \item{edge.pch}{optional character code for the edge.text, default: 0}
 #'   \item{edge.lwd}{the line width for the edges}
+#'   \item{arrows}{should edges been show in case graph is directed, default: TRUE}
 #'   \item{weighted}{should the edges be shown with different weights given within the adjacency matrix}
 #'   \item{star.center}{for layout 'star' the central node, default: NULL}
 #'   \item{\ldots}{arguments delegated to the plot function}
@@ -620,7 +621,7 @@ hgraph$layout <- function (x,mode='sam', noise=FALSE, star.center=NULL,interacti
 hgraph$plot = function (x,layout='sam',
                        vertex.size=1,vertex.labels=NULL,vertex.color="grey80",vertex.cex=1,vertex.pch=19,
                         edge.color="grey40",edge.lty=1,edge.text=NULL,edge.cex=1,edge.pch=0,
-                        edge.lwd=3,weighted=FALSE,
+                        edge.lwd=3,arrows=TRUE,weighted=FALSE,
                         star.center=NULL,...) {
     self = hgraph
     A=x
@@ -682,7 +683,7 @@ hgraph$plot = function (x,layout='sam',
             y=layout[c(i,j),2]
             hx <- 0.5 * x[1] + 0.5 * x[2]
             hy <- 0.5 * y[1] + 0.5 * y[2]
-            if (g=="undirected") {
+            if (g=="undirected" | !arrows) {
                 lines(x,y,lwd=wlwd,col=col,lty=clty)
                 if (is.matrix(edge.text)) {
                     jitx=  0 ; #diff(range(axTicks(1)))/16
