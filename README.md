@@ -1,25 +1,34 @@
 ## hanna
 
 R code for the paper - Hermanussen M, Dammhahn M, Scheffler C, Groth D (2023):
-_Winner-loser effects improve social network efficiency among competitors with equal resource._
+_Winner-loser effects improve social network efficiency among competitors with equal resource holding power._
 
 Installation:
 
+```r
+install.packages("https://github.com/mittelmark/hanna/releases/download/0.2.0/hanna_0.2.0.tar.gz",
+    repos=NULL)
 ```
+
+Alternatively  you can install the latest  version  directly from Github using
+the remotes library:
+
+```
+install.libarary(remotes)
 library(remotes)
 remotes::install_github("https://github.com/mittelmark/hanna")
 ```
 
 Thereafter you can check the installation like this:
 
-```
+```r
 library(hanna)
 citation("hanna")
 ```
 
 Which should display something like this:
 
-```
+```r
 > citation("hanna")
 To cite package 'hanna' in publications use:
 
@@ -28,6 +37,25 @@ To cite package 'hanna' in publications use:
   Monte Carlo simulations. R package version 0.1.
 
 ```
+
+## Vignette
+
+Beside of the R functions  and the manual  pages for them are three  vignettes
+which you can browser by using the vignette commands:
+
+```r
+> vignette(package="hanna")
+Vignettes in package 'hanna':
+
+simul-tutorial          Example simulations for the hanna package using
+                        the simul module (source, html)
+figures                 Hermanussen et. al. (2023) - Paper figures
+                        (source, html)
+hgraph-tutorial         hgraph introduction (source, html)
+
+> ### Let's load one vignette from this package
+> vignette("figures",package="hanna")
+
 
 ## Simulation
 
