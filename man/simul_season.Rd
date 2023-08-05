@@ -27,6 +27,7 @@
      \item{token}{vector of current tokens for each team} 
      \item{model}{the choosen model} 
      \item{memory}{list with last results for each agent} 
+     \item{game.prob}{matrix of probabilities for performing a game between two items} 
   } 
 } 
 \examples{ 

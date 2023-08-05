@@ -10,7 +10,7 @@
 \arguments{ 
   \item{n}{ how many repeats per model, default: 5} 
   \item{agents}{how many agents/teams, default: 12}  
-  \item{seasons}{ow many seasons, default: 3} 
+  \item{seasons}{how many seasons, default: 3} 
 } 
  
 \value{data frame with the results, last column model type} 
