@@ -6,24 +6,24 @@ _Winner-loser effects improve social network efficiency among competitors with e
 Installation:
 
 ```r
-install.packages("https://github.com/mittelmark/hanna/releases/download/0.2.0/hanna_0.2.0.tar.gz",
+> install.packages("https://github.com/mittelmark/hanna/releases/download/0.2.0/hanna_0.2.0.tar.gz",
     repos=NULL)
 ```
 
 Alternatively  you can install the latest  version  directly from Github using
 the remotes library:
 
-```
-install.libarary(remotes)
-library(remotes)
-remotes::install_github("https://github.com/mittelmark/hanna")
+```r
+> install.libarary(remotes)
+> library(remotes)
+> remotes::install_github("https://github.com/mittelmark/hanna")
 ```
 
 Thereafter you can check the installation like this:
 
 ```r
-library(hanna)
-citation("hanna")
+> library(hanna)
+> citation("hanna")
 ```
 
 Which should display something like this:
@@ -62,22 +62,22 @@ hgraph-tutorial         hgraph introduction (source, html)
 If the installation was successful, you can run a single season giving the
 agents as many tokens as there are agents in the game using the default null model like this:
 
-```
- > library(hanna)
- > res=simul$season(LETTERS[1:6])
- > res$token
- ## $token
- ## A B C D E F 
- ## 7 8 4 5 7 5 
- > res$M
- ## $M
- ##    A  B C  D  E F
- ## A  0 -1 1  1  0 0
- ## B  1  0 0  1  0 0
- ## C -1  0 0 -1  0 0
- ## D -1 -1 1  0 -1 1
- ## E  0  0 0  1  0 0
- ## F  0  0 0 -1  0 0
+```r
+> library(hanna)
+> res=simul$season(LETTERS[1:6])
+> res$token
+### $token
+### A B C D E F 
+### 7 8 4 5 7 5 
+> res$M
+### $M
+###    A  B C  D  E F
+### A  0 -1 1  1  0 0
+### B  1  0 0  1  0 0
+### C -1  0 0 -1  0 0
+### D -1 -1 1  0 -1 1
+### E  0  0 0  1  0 0
+### F  0  0 0 -1  0 0
 ```
 
 The token does represent the overall win and loosing points, so for instance A
@@ -91,7 +91,7 @@ If you have such a season with the embedded result matrix you can visualize
 this by using the function `simul$graph` and plotting the resulting adjacency
 matrix like this:
 
-```
+```r
 > A = simul$graph(res$M,model='win')
 > par(mfrow=c(1,2),mai=rep(0.4,2))  
 > hgraph$plot(A)  
