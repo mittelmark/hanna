@@ -1,7 +1,8 @@
 ## hanna
 
-R code for the paper - Hermanussen M, Dammhahn M, Scheffler C, Groth D (2023):
-_Winner-loser effects improve social network efficiency among competitors with equal resource holding power._
+R code for the paper - Hermanussen, M., Dammhahn, M., Scheffler C. & Groth. D.
+Winner-loser effects improve social network efficiency between competitors with equal resource holding power.
+Sci Rep 13, 14439 (2023). [https://doi.org/10.1038/s41598-023-41225-y](https://doi.org/10.1038/s41598-023-41225-y)
 
 Installation:
 
