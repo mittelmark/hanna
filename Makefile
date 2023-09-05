@@ -1,4 +1,4 @@
-VERSION := 0.2.0
+VERSION := $(shell grep Version: DESCRIPTION | perl -pe 's/.+: //')
 PKG     := $(shell basename `pwd`)
 build:
 	R CMD build . 
