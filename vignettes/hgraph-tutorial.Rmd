@@ -1,10 +1,10 @@
 ---
-title: "Short introduction into the hgraph module"
+title: Short introduction into the hgraph module
 author: Detlef Groth, Detlef Groth, University of Potsdam, Germany
 date: 2023-02-09
 output: function () { rmarkdown::html_vignette(toc=TRUE,css="style.css") }
 vignette: >
-  %\VignetteIndexEntry{hgraph introduction}
+  %\VignetteIndexEntry{Short introduction into the hgraph module}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 include-before: |
