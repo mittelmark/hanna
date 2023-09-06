@@ -39,7 +39,7 @@ jobs:
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
       - name: Check
-        run: rcmdcheck::rcmdcheck(args = c("--no-manual","--no-vignettes")a, error_on = "print")
+        run: rcmdcheck::rcmdcheck(args = c("--no-manual","--no-vignettes"), error_on = "print")
         shell: Rscript {0}
       - name: Set up R ${{ matrix.r-version }}
         uses: r-lib/actions/setup-r@v2
