@@ -201,14 +201,14 @@ head(agg2,n=10)
 agg=cbind(agg1,agg2$x,agg3$x,agg4$x)
 colnames(agg)=c('model','seasons','mean.apl','sd.apl','mean.wapl','sd.wapl')
 head(agg)
-write.table(agg,file="../inst/results/results.tab",sep="\t",quote=FALSE)
+write.table(agg,file="results.tab",sep="\t",quote=FALSE)
 ```
 
 No we display the results, they were cached in previous runs:
 
 ```{r label=write-table,eval=TRUE}
-if (file.exists(file.path("../inst/results/results.tab"))) {
-    agg=read.table("../inst/results/results.tab",header=TRUE,sep="\t")
+if (file.exists(file.path("results.tab"))) {
+    agg=read.table("results.tab",header=TRUE,sep="\t")
     library(knitr)
     for (i in 3:6) {
         agg[,i]=round(agg[,i],3)
