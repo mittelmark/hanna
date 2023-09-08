@@ -1,7 +1,7 @@
 source("R/simul.R")
 source("R/hgraph.R")
 t1=Sys.time()
-mode="random"
+mode="null" ;# "win"
 for (i in 1:10) {
     if (i == 1) {
         res=simul$season(LETTERS[1:20],model=mode)
