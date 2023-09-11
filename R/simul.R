@@ -62,18 +62,25 @@ simul$pairings <- function (x) {
         rownames(M)=colnames(M)=x
     }
     vec=rownames(M)
-    df=data.frame(round=c(),A=c(),B=c())
-    for (i in 1:(nrow(M)-1)) {
-        for (j in 1:(nrow(M)/2)) { 
+    #df=data.frame(round=c(),A=c(),B=c())
+    res=list()
+    m=nrow(M)
+    v=length(vec)
+    for (i in 1:(m-1)) {
+        for (j in 1:(m/2)) { 
             A=vec[j]
-            B=vec[(nrow(M)+1)-j]
-            df=rbind(df,data.frame(round=i,A=A,B=B))
+            B=vec[(m+1)-j]
+            #df=rbind(df,data.frame(round=i,A=A,B=B))
+            res[[i+j]]=data.frame(round=i,A=A,B=B)
         }
         cvec=vec; 
-        cvec[2]=vec[length(vec)]; 
-        cvec[3:length(vec)]=vec[2:(length(vec)-1)] ; 
+        cvec[2]=vec[v]; 
+        cvec[3:v]=vec[2:(v-1)] ; 
         vec=cvec ; 
+        v=length(vec)
     }
+    df=do.call(rbind,res)
+    colnames(df)=c('round','A','B')
     return(df)
 }
 # }}}
@@ -133,36 +140,17 @@ simul$season <- function (x,token=rep(length(x),length(x)),model='null',min.valu
         idx=which(rbinom(length(p),1,p=p)==1)
         pairings=pairings[idx,]
     }
-    for (i in 1:nrow(pairings)) {
+    n=nrow(pairings)
+    for (i in 1:n) {
         A=pairings[i,2]
         B=pairings[i,3]
-        #        if (is.matrix(game.prob)) {
-        #            p=game.prob[A,B]
-        #            if (p > 0) {
-        #                g=rbinom(1,1,prob=p)
-        #            } else {
-        #                g = 0
-        #            }
-        #                
-        #            if (g == 0) {
-        #                res=c(0,0)
-        #                x[A,B]=res[1]
-        #                x[B,A]=res[2]
-        #                next
-        #            }
-        #        }
         if (model=="null") {
             smp=c(rep(A,length(nms)),rep(B,length(nms)))
         } else if (model == "chance") {
             smp=c(A,A,B,B,rep(A,token[A]),rep(B,token[B]))
         } else if (model == "memory") {
-            #tokA=memory.length+sum(memory[[A]])
-            #tokB=memory.length+sum(memory[[B]])
-            #tokA=5+token[[A]]-memory[[A]][length(memory[[A]])]
-            #tokB=5+token[[B]]-memory[[B]][length(memory[[B]])]
             tokA=5+sum(memory[[A]]) # length(token)
             tokB=5+sum(memory[[B]])
-            #token[[B]]-memory[[B]][length(memory[[B]])]
             smp=c(rep(A,tokA),rep(B,tokB)) 
         } else {
             if (token[A]> 0 & token[B] > 0) {
@@ -221,8 +209,7 @@ simul$season <- function (x,token=rep(length(x),length(x)),model='null',min.valu
         if (token[A]<0) {
             token[A]=0
             token[B]=token[B]-1
-        }
-        if (token[B]<0) {
+        } else if (token[B]<0) {
             token[B]=0
             token[A]=token[A]-1
         }
@@ -231,6 +218,20 @@ simul$season <- function (x,token=rep(length(x),length(x)),model='null',min.valu
     return(list(M=x,token=token,model=model,memory=memory))
 }
 
+Simul_prob2season <- function (prob) {
+    idx2dim = function (idx,x) { return(c((idx-1) %% nrow(x)+1,(idx-1) %/% nrow(x) +1)) }
+    prob[lower.tri(prob)]=0
+    idx = which(prob==1)
+    season=matrix(idx2dim(idx,prob),ncol=2)
+    idxs = sample(1:nrow(season))
+    season=as.data.frame(season[idxs,])
+    season[,1]=rn[season[,1]]
+    season[,2]=rn[season[,2]]
+    colnames(season)=c("A","B")
+    season=cbind(round=c(1:nrow(season)),season)
+    rn=rownames(prob)
+    return(season)
+}
 Simul_season2 <- function (x,memory=NULL,
                            memory.length=0) {
     pairings=simul$pairings(x)

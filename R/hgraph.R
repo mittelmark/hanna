@@ -397,11 +397,16 @@ hgraph$triads <- function (x,percent=FALSE) {
         stop("Only directed graphs can be used for triad calculations")
     }
     cnames=colnames(g)
-    for (i in 1:(ncol(g)-2)) {
-        for (j in (i+1):(ncol(g)-1)) {
-            for (k in (j+1):(ncol(g))) {
+    # that does not do much improvement
+    ng=ncol(g)
+    ng2=ng-2
+    ng1=ng-1
+    for (i in 1:ng2) {
+        for (j in (i+1):ng1) {
+            for (k in (j+1):ng) {
                 h=g[c(i,j,k),c(i,j,k)]
-                if (sum(h)==2) {
+                sh=sum(h)
+                if (sh==2) {
                     if (max(apply(h,1,sum))==2) {
                         res$dd=res$dd+1
                     } else if (max(apply(h,2,sum))==2) {
@@ -409,7 +414,7 @@ hgraph$triads <- function (x,percent=FALSE) {
                     } else {
                         res$pa=res$pa+1
                     }
-                } else if (sum(h) == 3) {
+                } else if (sh == 3) {
                     if (max(apply(h,1,sum))==2) {
                         res$tr=res$tr+1
                     } else {
