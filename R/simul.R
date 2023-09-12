@@ -66,12 +66,14 @@ simul$pairings <- function (x) {
     res=list()
     m=nrow(M)
     v=length(vec)
+    k=0
     for (i in 1:(m-1)) {
         for (j in 1:(m/2)) { 
+            k=k+1
             A=vec[j]
             B=vec[(m+1)-j]
             #df=rbind(df,data.frame(round=i,A=A,B=B))
-            res[[i+j]]=data.frame(round=i,A=A,B=B)
+            res[[k]]=data.frame(round=i,A=A,B=B)
         }
         cvec=vec; 
         cvec[2]=vec[v]; 
