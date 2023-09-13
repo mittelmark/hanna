@@ -97,7 +97,7 @@ simul$pairings <- function (x) {
 #'   of the given model.
 #' }
 #' \usage{ `simul$season(x,token=rep(length(x),length(x)),model="null",
-#'                            min.value=4,memory=NULL,memory.length=1)` }
+#'                            min.value=4,memory=NULL,memory.length=1, game.prob=NULL, season="season")` }
 #' \arguments{
 #'   \item{x}{ vector of teams }
 #'   \item{token}{ vector of token for each team, which might influence the match outcone, depending on the given model, defaults: 5 }
@@ -105,6 +105,7 @@ simul$pairings <- function (x) {
 #'   \item{min.value}{ for the model 'last' how low is the minimal value for each team, default: 4}
 #'   \item{memory}{optional vector of last results for each agent}
 #'   \item{memory.length}{how many of last results should be stored, default: 1}
+#'   \item{season}{type of season either regular - "season" or "random" for random pairings, default: "season"}
 #' }
 #' \details{
 #'     This function allows you to create matches for all against all in a season and performs the matches
@@ -116,7 +117,6 @@ simul$pairings <- function (x) {
 #'      \item{token}{vector of current tokens for each team}
 #'      \item{model}{the choosen model}
 #'      \item{memory}{list with last results for each agent}
-#'      \item{game.prob}{matrix of probabilities for performing a game between two items}
 #'   }
 #' }
 #' \examples{
@@ -126,8 +126,21 @@ simul$pairings <- function (x) {
 #' }
 #' 
 
-simul$season <- function (x,token=rep(length(x),length(x)),model='null',min.value=4,memory=NULL,memory.length=1,game.prob=NULL) {
-    pairings=simul$pairings(x)
+simul$season <- function (x,token=rep(length(x),length(x)),model='null',min.value=4,
+                          memory=NULL,memory.length=1,game.prob=NULL,season="season") {
+    if (season == "season") {
+        pairings=simul$pairings(x)
+    } else if (season == "random") {
+        if (!is.matrix(game.prob)) {
+            pairings=simul$pairings(x)
+            idx=sample(1:nrow(pairings))
+            pairings=pairings[idx,]
+        } else {
+            pairings=Simul_prob2season(game.prob)
+        }
+    } else {
+        stop("season can be only 'season' or 'random'")
+    }
     if (class(memory) == "NULL") {
         memory=lapply(x,function(x) { return(rep(0,memory.length+1)) })
         names(memory)=x
@@ -611,12 +624,14 @@ simul$gompertz <- function(x, a=1, b=0.5, c=0.2) {
 #'   This function calculates for the given coordinates probability values
 #'   using the Gompertz function.
 #' }
-#' \usage{ `simul$d2prob(x, b=50, c=1.5)` }
+#' \usage{ `simul$d2prob(x, b=50, c=1.5, d=3, mode='gompertz')` }
 #'
 #' \arguments{
 #'   \item{x}{given x values}
 #'   \item{b}{displacment value for the Gompertz function, default: 50} 
 #'   \item{c}{growth rate value for the Gompertz function, default: 1.5}
+#'   \item{d}{threshold for distance if mode is "euclidean", default: 3} 
+#'   \item{mode}{how to calculate the distances either "gompertz" or "euclidean", default: "gompertz"}
 #' }
 #' \value{matrix of probability values based on Gompertz function }
 #' \examples{
@@ -624,13 +639,23 @@ simul$gompertz <- function(x, a=1, b=0.5, c=0.2) {
 #' plot(res,pch=19,cex=2,col="blue")
 #' P=simul$d2prob(res)
 #' round(P,2)[1:14,1:14]
+#' P=simul$d2prob(res,mode="euc")
+#' round(P,2)[1:14,1:14]
 #' }
 #' 
 
-simul$d2prob <- function (x,b=50,c=1.5) {
+simul$d2prob <- function (x,b=50,c=1.5,d=3,mode="gompertz") {
     D = as.matrix(dist(x))
     P = D
-    P[] = 1+simul$gompertz(D,a=-1,b=b,c=c)
+    if (mode == "gompertz") {
+        P[] = 1+simul$gompertz(D,a=-1,b=b,c=c)
+    } else if (mode %in% c("euc","euclidean")) {
+        P       = P < 3
+        diag(P) = FALSE
+        P[]     = as.numeric(P)
+    } else {
+        stop("Error: mode can be either 'gompertz' or 'euclidean'!")
+    }
     return(P)
 }
 
