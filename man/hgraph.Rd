@@ -18,6 +18,7 @@
       \item \code{\link[hanna:hgraph_layout]{hgraph$layout}} - calculate a plot layout for an adjacency matrix 
       \item \code{\link[hanna:hgraph_plot]{hgraph$plot}} - plot an adjacency matrix  
       \item \code{\link[hanna:hgraph_shortest_paths]{hgraph$shortest_paths}} - calculate the shortest paths between all nodes of an adjacency matrix  
+      \item \code{\link[hanna:hgraph_tokenplot]{hgraph$tokenplot}} - colored barplot to show token distribution 
       \item \code{\link[hanna:hgraph_triads]{hgraph$triads}} - calculate the number of two and tri edge triads 
    } 
 } 
