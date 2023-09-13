@@ -724,13 +724,9 @@ plot.graph=hgraph$plot
 #' \title{Barplot with default token color codes }
 #' \usage{`hgraph$tokenplot(x,xlab="token ranges", ylab="proportion", ...)`}
 #' \description{
-#'   This function is used to create a layout for a given graph.
-#'  
-#'   There are a few algorithms available such as MDS based ones like 'mds' or 'sam'
-#'   and circular layouts like 'circle' or 'star', furthermore there is 
-#'   the possibility to use an interactive mode where the user clicks 
-#'   first on a node and then on the space where the node should be moved. 
-#'   This interactive mode can be finished by a right click.
+#'   This function is used to create a barplot to show the proportion of tokens
+#'   for nodes in the ranges 0 and 1, 2 to 9, 10 to 20 and 20 or higher with
+#'   color coding.
 #' }
 #' \arguments{
 #'   \item{x}{vector of token values for a set of nodes}
@@ -752,6 +748,7 @@ hgraph$tokenplot <- function (x,xlab="token ranges",ylab="proportion",...) {
     barplot(prop.table(table(tok)),col=c('skyblue','grey80','salmon','red'),ylim=c(0,1),
             cex.lab=1.8,ylab=ylab,xlab=xlab,...)
 }
+
 # private functions
 
 
