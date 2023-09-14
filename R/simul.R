@@ -436,6 +436,7 @@ simul$compare <- function (n=5,agents=12,seasons=3) {
  
 # }}}
 
+
 ### New functions for release 0.2.0
 
 #' \name{simul$getProbMatrix} %{{{
@@ -563,24 +564,25 @@ simul$gini <- function (x) {
 #'   Returns coordinates for a certain nuber of nodes in a regular grid with some added noise to 
 #'   to improve visibility of edges between nodes.
 #' }
-#' \usage{ `simul$gridAgents(x)` }
+#' \usage{ `simul$gridAgents(x,sd=0.1)` }
 #'
 #' \arguments{
 #'   \item{x}{ grid dimension, given value x will create x * x network of coordinates }
+#'   \item{sd}{ standard deviation for the scatter ofthe points, default: 0.1}
 #' }
 #' \value{computed Gini coefficient }
 #' \examples{
 #' round(simul$gridAgents(4),2)
 #' }
 #' 
-simul$gridAgents <- function (x=10) {
+simul$gridAgents <- function (x=10,sd=0.1) {
     n=x
     lay=matrix(0,nrow=n*n,ncol=2)
     colnames(lay)=c('x','y')
     for (i in 1:n) {
         for (j in 1:n) {
-            x=rnorm(1,mean=i,sd=0.1)
-            y=rnorm(1,mean=j,sd=0.1)
+            x=rnorm(1,mean=i,sd=sd)
+            y=rnorm(1,mean=j,sd=sd)
             lay[(i*n)-n+j,'x']=x
             lay[(i*n)-n+j,'y']=y
         }
