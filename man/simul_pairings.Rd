@@ -1,4 +1,4 @@
-\name{simul$pairings} %{{{ 
+\name{simul$pairings} 
 \alias{simul_pairings} 
 \alias{simul$pairings} 
 \title{ Create matching pairs everyone against every one. } 

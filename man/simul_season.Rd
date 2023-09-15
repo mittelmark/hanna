@@ -1,4 +1,4 @@
-\name{simul$season} %{{{ 
+\name{simul$season} 
 \alias{simul_season} 
 \alias{simul$season} 
 \title{ Create matches for everyone against everyone using the given model. } 

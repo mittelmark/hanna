@@ -1,7 +1,7 @@
 \name{simul$getProbMatrix} %{{{ 
 \alias{simul_getProbMatrix} 
 \alias{simul$getProbMatrix} 
-\title{ Get a probability matrix for games between agents. } 
+\title{Get a probability matrix for games between agents} 
 \description{ 
   This function returns a probability matrix for a certain number of agents 
   to express the probabilty that they are matched in a game. 

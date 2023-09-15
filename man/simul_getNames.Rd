@@ -1,7 +1,7 @@
 \name{simul$getNames} %{{{ 
 \alias{simul_getNames} 
 \alias{simul$getNames} 
-\title{ Get automatic node names for a certain number of items. } 
+\title{Get automatic node names for a certain number of items} 
 \description{ 
   This function returns names for a certain number of items to be shown 
   for instance in a graph. 

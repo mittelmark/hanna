@@ -6,8 +6,8 @@ source("R/hgraph.R")
 t1=Sys.time()
 mode="gain" ;# "null","landscape", "gain"
 n=81
-euc=2.1
-lay=simul$gridAgents(sqrt(n),sd=0.05)
+euc=2.2
+lay=simul$gridAgents(sqrt(n),sd=0.15)
 rn=sprintf("N%02i",1:n)
 rownames(lay)=rn
 game.prob=as.matrix(dist(lay))
@@ -52,7 +52,7 @@ plot_summary= function (x,main=main,FUN=function(x){signif(x,3) },...) {
     text(1:6,y=0.5,FUN(sx,...),cex=1.4)
     text(1:6,y=1.5,names(sx),cex=1.5)
 }
-plot_summary(apply(gp,1,sum),FUN=round,2,main="Number of neighbours")
+plot_summary(apply(gp,1,sum),FUN=round,2,main="Number of agent matches")
 par(mfrow=c(2,4),mai=rep(0.5,4))
 for (model in c("null","gain")) {
     for (mode in c("random", "season")) {
@@ -109,51 +109,6 @@ for (model in c("null","gain")) {
     mtext(model,side=3,outer=TRUE,line=-1)
 }
 
-modelCheck <- function (rn,itersteps=c(1,5,10,30), n=5,layout=NULL,...) {
-    results=list()
-    m=matrix(c(1,4,7,10,2,5,8,11,3,6,9,12,13,14,15,16),nrow=4,byrow=TRUE)
-    par(mai=c(0.1,0.1,0.7,0.1))
-    layout(m)
-    k=0
-    for (i in 1:n) {
-        for (j in 1:max(itersteps)) {
-            if (j == 1) {
-                res=simul$season(rn,token=rep(5,length(rn)),...)
-            } else {
-                res=simul$season(rn,token=res$token,...)
-            }  
-            if (j %in% itersteps) {
-                g=simul$graph(res$M,mode="win")
-                if (i == 1) {
-                    par(mai=c(0.1,0.1,0.7,0.1))
-                    cols=rep("grey80",ncol(res$M))
-                    cols[res$token>9] = "salmon"
-                    cols[res$token<2] = "skyblue"
-                    cols[res$token>20] = "red"
-                    hgraph$plot(g,layout='sam',vertex.color=cols,vertex.size=0.5,arrows=FALSE,edge.lwd=1);
-                    mtext(paste("season",j),side=3)
-                    if(is.matrix(layout)) {
-                        hgraph$plot(g,layout=layout,vertex.color=cols,vertex.size=0.5,arrows=FALSE,edge.lwd=1);
-                    } else {
-                        hgraph$plot(g,layout="circle",vertex.color=cols,vertex.size=0.5,arrows=FALSE,edge.lwd=1);
-                    }
-                    par(mai=c(0.2,0.6,0.4,0.2))
-                    hgraph$tokenplot(res$token,xlab="",ylab="")
-                    mtext(sprintf("Gini: %0.2f",simul$gini(res$token)),side=3,line=-2)
-                }
-                k=k+1
-                results[[k]] = data.frame(season=j,t(data.frame(unlist(hgraph$triads(g)))))
-            }
-                
-        }
-    }
-    results=do.call(rbind,results)
-    par(mai=c(0.6,0.6,0.6,0.2))
-    for (iter in itersteps) {
-        set=results[results$season==iter,2:6]
-        boxplot(set)
-    }
-}
 modelCheck(rn,model="gain",game.prob=gp,season="season",layout=lay)
 mtext("Gain model - season schedule of matches gain model", side=3, outer=TRUE,line=-2)
 

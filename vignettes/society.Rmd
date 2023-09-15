@@ -1,0 +1,50 @@
+---
+title: Cooperation and Society Effects in a Winner-Looser simulation
+author: Detlef Groth
+date: 2023-09-15 11:31
+output: 
+    rmarkdown::html_vignette:
+        toc: true
+vignette: >
+  %\VignetteIndexEntry{Cooperation and Society Effects in a Winner-Looser simulation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+include-before: |
+    <style> 
+    body { max-width: 1000px; font-family: Candara, sans-serif;} 
+    table { min-width: 400px; border-spacing: 5px;  border-collapse: collapse;    }
+    h4.author, h4.date { font-size: 150%; }
+    </style>
+---
+
+## Introduction
+
+This vignette  explores some concepts of cooperation  and society  effects for
+the  structure  of a  network  of  agents in a Monte  Carlo  simulation  using
+a Winner-Looser model.
+
+## The network
+
+Let's  create  an  illustrative  grid like  network  of agents in a landscape
+structure.
+
+```{r label=layoutcheck,fig.width=16,fig.height=9,out.width=1000}
+library(hanna)
+t1=Sys.time()
+n=25
+sd=0.1
+d=2.1
+grid=simul$gridAgents(round(sqrt(n)),sd=sd)
+P=simul$d2prob(grid,mode="euc",d=d)
+simul$checkLayout(grid,P)
+mtext(side=3,sprintf("distance=euclidean, d=%0.1f, s=%0.1f",d,sd),outer=TRUE,cex=1.4,line=-2)
+```
+
+```{r label=modelcheck,fig.width=16,fig.height=9,out.width=1000}
+simul$checkModel(grid,season="random",model="gain",game.prob=P)
+secs=as.numeric(difftime(Sys.time(), t1, units = "secs"))
+```
+
+
+## EOF
+

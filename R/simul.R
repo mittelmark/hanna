@@ -1,19 +1,27 @@
-# vim: set foldmethod=marker:
-
-#' \docType{class}  
-#' \name{simul} %{{{
+#' \docType{class}
+#' \name{simul}
 #' \alias{simul}
 #' \alias{simul-class}
 #' \title{ Environment obkject with functions do simulate winner-looser effects. }
 #' \description{
 #' The functions within the simul environment perform simulations of
-#' winner-looser effects for the paper ...
+#' winner-looser effects for the paper 
+#' Hermanussen, M., Dammhahn, M., Scheffler, C. et al. Winner-loser effects improve social network efficiency between competitors with equal resource holding power. Sci Rep 13, 14439 (2023). https://doi.org/10.1038/s41598-023-41225-y
 #' }
 #' \section{Methods}{
 #' \itemize{
+#' \item \code{\link[hanna:simul_checkLayout]{simul$checkLayout}} - check a layout with given probabilities for the number of matches
+#' \item \code{\link[hanna:simul_checkModel]{simul$checkModel}} - check a model with graphics and triad statistics
 #' \item \code{\link[hanna:simul_compare]{simul$compare}} - compare the different models for a certain number of seasons
+#' \item \code{\link[hanna:simul_d2prob]{simul$d2prob}} - convert distances between points to probabilities using Gompertz function
+#' \item \code{\link[hanna:simul_getProbMatrix]{simul$getProbMatrix}} - get a probability matrix for games between agents
+#' \item \code{\link[hanna:simul_getNames]{simul$getNames}} - get automatic node names for a certain number of items
+#' \item \code{\link[hanna:simul_gini]{simul$gini}} - Gini coefficient
+#' \item \code{\link[hanna:simul_gompertz]{simul$gompertz}} - Gompertz function
 #' \item \code{\link[hanna:simul_graph]{simul$graph}} - create a adjacency matrix out of the results for a match season
+#' \item \code{\link[hanna:simul_gridAgents]{simul$gridAgents}} - grid layout of nodes in a network with some noise
 #' \item \code{\link[hanna:simul_pairings]{simul$pairings}} - create roundpairings for a season
+#' \item \code{\link[hanna:simul_prob2game]{simul$prob2game}} - convert probabilities matrices to 0 and 1 matrices
 #' \item \code{\link[hanna:simul_season]{simul$season}} - create matches for everyone against everyone using the given model
 #' }
 #' }
@@ -26,10 +34,8 @@
 
 simul=new.env()
 
-# }}}
 
-
-#' \name{simul$pairings} %{{{
+#' \name{simul$pairings}
 #' \alias{simul_pairings}
 #' \alias{simul$pairings}
 #' \title{ Create matching pairs everyone against every one. }
@@ -85,9 +91,8 @@ simul$pairings <- function (x) {
     colnames(df)=c('round','A','B')
     return(df)
 }
-# }}}
 
-#' \name{simul$season} %{{{
+#' \name{simul$season}
 #' \alias{simul_season}
 #' \alias{simul$season}
 #' \title{ Create matches for everyone against everyone using the given model. }
@@ -235,6 +240,7 @@ simul$season <- function (x,token=rep(length(x),length(x)),model='null',min.valu
 
 Simul_prob2season <- function (prob) {
     idx2dim = function (idx,x) { return(c((idx-1) %% nrow(x)+1,(idx-1) %/% nrow(x) +1)) }
+    rn=rownames(prob)
     prob[lower.tri(prob)]=0
     idx = which(prob==1)
     season=matrix(idx2dim(idx,prob),ncol=2)
@@ -244,7 +250,6 @@ Simul_prob2season <- function (prob) {
     season[,2]=rn[season[,2]]
     colnames(season)=c("A","B")
     season=cbind(round=c(1:nrow(season)),season)
-    rn=rownames(prob)
     return(season)
 }
 Simul_season2 <- function (x,memory=NULL,
@@ -299,7 +304,6 @@ Simul_season2 <- function (x,memory=NULL,
     return(list(M=x,token=token,memory=memory))
 
 }
-#  }}}
 
 #' \name{simul$graph} %{{{
 #' \alias{simul$graph}
@@ -442,7 +446,7 @@ simul$compare <- function (n=5,agents=12,seasons=3) {
 #' \name{simul$getProbMatrix} %{{{
 #' \alias{simul_getProbMatrix}
 #' \alias{simul$getProbMatrix}
-#' \title{ Get a probability matrix for games between agents. }
+#' \title{Get a probability matrix for games between agents}
 #' \description{
 #'   This function returns a probability matrix for a certain number of agents
 #'   to express the probabilty that they are matched in a game.
@@ -496,7 +500,7 @@ simul$getProbMatrix  <- function (n,sd=1,mode='a') {
 #' \name{simul$getNames} %{{{
 #' \alias{simul_getNames}
 #' \alias{simul$getNames}
-#' \title{ Get automatic node names for a certain number of items. }
+#' \title{Get automatic node names for a certain number of items}
 #' \description{
 #'   This function returns names for a certain number of items to be shown
 #'   for instance in a graph.
@@ -570,7 +574,7 @@ simul$gini <- function (x) {
 #'   \item{x}{ grid dimension, given value x will create x * x network of coordinates }
 #'   \item{sd}{ standard deviation for the scatter ofthe points, default: 0.1}
 #' }
-#' \value{computed Gini coefficient }
+#' \value{matrix with coordinate columns x and y}
 #' \examples{
 #' round(simul$gridAgents(4),2)
 #' }
@@ -587,6 +591,7 @@ simul$gridAgents <- function (x=10,sd=0.1) {
             lay[(i*n)-n+j,'y']=y
         }
     }   
+    rownames(lay)=simul$getNames(nrow(lay))
     return(lay)
 }
 
@@ -652,13 +657,147 @@ simul$d2prob <- function (x,b=50,c=1.5,d=3,mode="gompertz") {
     if (mode == "gompertz") {
         P[] = 1+simul$gompertz(D,a=-1,b=b,c=c)
     } else if (mode %in% c("euc","euclidean")) {
-        P       = P < 3
+        P       = P < d
         diag(P) = FALSE
         P[]     = as.numeric(P)
     } else {
         stop("Error: mode can be either 'gompertz' or 'euclidean'!")
     }
     return(P)
+}
+
+#' \name{simul$checkModel}
+#' \alias{simul_checkModel}
+#' \alias{simul$checkModel}
+#' \title{ Evaluate the performance of simulation models with summaries and graphically }
+#' \description{
+#'   This function evaluates given model parameters and visualizes them in some plots.
+#' }
+#' \usage{ `simul$checkModel(x,itersteps=c(1,5,10,30), n=5,layout=NULL,...)` }
+#'
+#' \arguments{
+#'   \item{x}{given agents names}
+#'   \item{itersteps}{vector of numbers to define which iteration steps to monitor, the highest value is the maximum number of iterations, default: c(1,5,10,30)} 
+#'   \item{n}{number of repetitions for model evaluation, default: 5}
+#'   \item{layout}{two dimensional matrix for the x and y coordinates to display, default: NULL} 
+#'   \item{\ldots}{Arguments delegated to the `simul$season` function}
+#' }
+#' \value{data frame with the triad counts for the different repetitios }
+#' \examples{
+#' grid=simul$gridAgents(4,sd=0.1)
+#' P=simul$d2prob(grid,mode="euc",d=2.1)
+#' res=simul$checkModel(grid,season="random",model="gain",game.prob=P)
+#' head(res)
+#' aggregate(res,by=list(res$season),mean)
+#' }
+#' 
+
+simul$checkModel <- function (x,itersteps=c(1,5,10,30), n=5,layout=NULL,...) {
+    if (is.matrix(x)) {
+        rn=rownames(x)
+        layout=x
+    } else {
+        rn=x
+    }
+    results=list()
+    m=matrix(c(1,4,7,10,2,5,8,11,3,6,9,12,13,14,15,16),nrow=4,byrow=TRUE)
+    par(mai=c(0.1,0.1,0.7,0.1))
+    layout(m)
+    k=0
+    for (i in 1:n) {
+        for (j in 1:max(itersteps)) {
+            if (j == 1) {
+                res=simul$season(rn,token=rep(5,length(rn)),...)
+            } else {
+                res=simul$season(rn,token=res$token,...)
+            }  
+            if (j %in% itersteps) {
+                g=simul$graph(res$M,mode="win")
+                if (i == 1) {
+                    par(mai=c(0.1,0.1,0.6,0.1))
+                    cols=rep("grey80",ncol(res$M))
+                    cols[res$token>9] = "salmon"
+                    cols[res$token<2] = "skyblue"
+                    cols[res$token>20] = "red"
+                    hgraph$plot(g,layout='sam',vertex.color=cols,vertex.size=0.4,arrows=FALSE,edge.lwd=1);
+                    mtext(paste("season",j),side=3)
+                    par(mai=c(0.1,0.1,0.1,0.1))
+                    if(is.matrix(layout)) {
+                        hgraph$plot(g,layout=layout,vertex.color=cols,vertex.size=0.4,arrows=FALSE,edge.lwd=1);
+                    } else {
+                        hgraph$plot(g,layout="circle",vertex.color=cols,vertex.size=0.5,arrows=FALSE,edge.lwd=1);
+                    }
+                    par(mai=c(0.3,0.3,0.3,0.1))
+                    hgraph$tokenplot(res$token,xlab="",ylab="")
+                    mtext(sprintf("Gini: %0.2f",simul$gini(res$token)),side=3,line=-1,cex=0.7)
+                }
+                k=k+1
+                results[[k]] = data.frame(season=j,t(data.frame(unlist(hgraph$triads(g)))))
+            }
+                
+        }
+    }
+    results=do.call(rbind,results)
+    par(mai=c(0.3,0.3,0.4,0.2))
+    for (iter in itersteps) {
+        set=results[results$season==iter,2:6]
+        boxplot(set)
+    }
+    return(results)
+}
+
+#' \name{simul$checkLayout}
+#' \alias{simul_checkLayout}
+#' \alias{simul$checkLayout}
+#' \title{ Check and visualize layout with a probability matrix for match statistics}
+#' \description{
+#'   This function is useful for detect the basic properties of a model network to evaluate the matching statistics
+#' }
+#' \usage{ `simul$checkLayout(x,game.prob=NULL)` }
+#'
+#' \arguments{
+#'   \item{x}{layout of a network}
+#'   \item{game.prob}{probability of games between the agents, if not given all against all is assumed,default: NULL}
+#' }
+#' \value{data frame with the triad counts for the different repetitios }
+#' \examples{
+#' grid=simul$gridAgents(4,sd=0.1)
+#' P=simul$d2prob(grid,mode="euc",d=2.1)
+#' simul$checkLayout(grid,P)
+#' }
+#' 
+
+simul$checkLayout <- function (x,game.prob=NULL) {
+    opar=par()
+    if (sum(par()$mfrow) == 2) {
+        layout(matrix(c(1,1,2,1,1,3),nrow=2,byrow=TRUE))
+    }
+    if (!is.matrix(game.prob)) {
+        game.prob=matrix(1,nrow=nrow(x),ncol=nrow(x))
+        rownames(game.prob)=colnames(game.prob)=rownames(x)
+        diag(game.prob)=0
+    }
+    plot_summary = function (x,main=main,FUN=function(x){signif(x,3) },...) {
+        plot(1,type="n",xlim=c(0.5,6.5),ylim=c(0,3),axes=FALSE,xlab="",ylab="",main=main)
+        sx=summary(x)
+        text(3.5,2.5,sprintf("Summary\n(%i agents, %i matches, density = %0.3f)",length(x), sum(game.prob)/2, sum(game.prob)/(nrow(game.prob)^2-nrow(game.prob))),cex=1.4)
+        lines(c(0.6,6.4),y=c(3,3),lwd=2)
+        lines(c(0.6,6.4),y=c(2,2),lwd=2)
+        lines(c(0.6,6.4),y=c(0,0),lwd=2)
+        text(1:6,y=0.5,FUN(sx,...),cex=1.4)
+        text(1:6,y=1.5,names(sx),cex=1.3)
+    }
+    gp=game.prob
+    gp[gp!=0]=1
+    par(mai=c(0,0,0,0))
+    hgraph$plot(gp,layout=x,vertex.size=0.5,arrows=FALSE,edge.lwd=1);
+    par(mai=c(0.6,0.6,0.8,0.2))
+    #barplot(table(apply(gp,1,sum)),main="Matches per agent",names.arg=c(),xlim=c(0,nrow(gp)),axes=FALSE)
+    hist(apply(gp,1,sum),freq=FALSE,xlim=c(0,nrow(gp)),xlab="matches per agent")
+    lines(density(apply(gp,1,sum)),lwd=3,col="red")
+    #axis(1)
+    plot_summary(apply(gp,1,sum),FUN=round,2,main="Match per agent summary")
+    
 }
 
 #' \name{simul$prob2game}
