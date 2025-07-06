@@ -9,7 +9,8 @@
 \usage{ `simul$gini(x)` } 
  
 \arguments{ 
-  \item{x}{ vector with numerical vectorss } 
+  \item{x}{ vector with numerical values } 
+  \item{method}{either "glasser-brown" or "lorenz", default = "glasser-brown"} 
 } 
 \value{computed Gini coefficient } 
 \examples{ 
