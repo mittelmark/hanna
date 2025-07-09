@@ -10,7 +10,7 @@
  
 \arguments{ 
   \item{x}{ vector with numerical values } 
-  \item{method}{either "glasser-brown" or "lorenz", default = "glasser-brown"} 
+  \item{method}{either "ranked-gini" or "lorenz", default = "ranked-gini"} 
 } 
 \value{computed Gini coefficient } 
 \examples{ 

@@ -522,7 +522,7 @@ simul$getNames <- function (n) {
 #'
 #' \arguments{
 #'   \item{x}{ vector with numerical values }
-#'   \item{method}{either "glasser-brown" or "lorenz", default = "glasser-brown"}
+#'   \item{method}{either "ranked-gini" or "lorenz", default = "ranked-gini"}
 #' }
 #' \value{computed Gini coefficient }
 #' \examples{
@@ -532,7 +532,7 @@ simul$getNames <- function (n) {
 #' 
 
 ### https://github.com/oliviaguest/gini/blob/master/gini.py
-simul$gini <- function (x, method = c("glasser-brown", "lorenz" )) { 
+simul$gini <- function (x, method = c("ranked-gini", "lorenz" )) { 
     method <- match.arg(method)
 
     # extreme case: everyone has nothing
@@ -540,7 +540,7 @@ simul$gini <- function (x, method = c("glasser-brown", "lorenz" )) {
         return(0)
 
     # Glasser Brown; Rank based #
-    if(method == "glasser-brown"){
+    if(method == "ranked-gini"){
         x = x-min(x)+0.00001; 
         x=sort(x); 
         n=length(x); 
