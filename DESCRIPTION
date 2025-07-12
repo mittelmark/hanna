@@ -1,7 +1,7 @@
 Package: hanna
 Type: Package
 Title: Winner-looser effects for social network efficiency simulated using Monte Carlo simulations
-Version: "0.3.0"
+Version: 0.3.0
 Date: 2025-07-12
 Author: Detlef Groth, Sarah Leutner, University of Potsdam
 Maintainer: Detlef Groth <dgroth@uni-potsdam.de>
