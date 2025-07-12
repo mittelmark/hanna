@@ -7,12 +7,12 @@
   directed graphs.  
   
   The following triads are possible: 
-  \itemize{ 
-    \item double-dominant (dd) A->B; A->C 
-    \item double-subordinate (ds) A->B; C->B 
-    \item pass-along (pa) A->B->C 
-    \item transitive (tr) A->B; A->C ; B->C 
-    \item cycle (cy) A->B->C->A 
+  \describe{ 
+    \item{double-dominant (dd)}{A->B; A->C} 
+    \item{double-subordinate (ds)}{A->B; C->B} 
+    \item{pass-along (pa)}{A->B->C} 
+    \item{transitive (tr)}{A->B; A->C ; B->C} 
+    \item{cycle (cy)}{A->B->C->A} 
   } 
 } 
 \arguments{ 
@@ -20,13 +20,11 @@
   \item{percent}{ should the results be return not wihh total numbers but in percent, default: FALSE} 
 } 
 \value{ list object with the following components: 
- \itemize{ 
    \item{dd}{number of double dominant triads} 
    \item{ds}{number of double subordinate triads} 
    \item{pa}{number of pass-along triads} 
    \item{tr}{number of transitive triads} 
    \item{cy}{number of cycle triads} 
- } 
 } 
 \examples{ 
 A = matrix(rbinom(49,1,p=0.3),nrow=7) 

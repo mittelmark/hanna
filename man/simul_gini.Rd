@@ -6,7 +6,7 @@
   Returns the Gin coefficient for inequality, where 1 is the highest possible inequality  
   and zero is total equality. 
 } 
-\usage{ `simul$gini(x)` } 
+\usage{ `simul$gini(x,method=c("ranked-gini", "lorenz" ))` } 
  
 \arguments{ 
   \item{x}{ vector with numerical values } 

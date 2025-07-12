@@ -7,11 +7,11 @@
    competitors with equal resource holding power." 
  
  The following objects / modules are available: 
-\itemize{ 
+\describe{ 
+  \item{\link[hanna:hgraph]{hgraph}}{ R utility code functions for working with graphs} 
+  \item{\link[hanna:simul]{simul}}{ R code for the simulation of the effect} 
+} 
+} 
  
-\item{\link[hanna:simul]{simul}}{ R code for the simulation of the effect} 
-\item{\link[hanna:hgraph]{hgraph}}{ R utility code functions for working with graphs} 
-}} 
- 
-\author{Detlef Groth, University of Potsdam, Germany} 
+\author{Detlef Groth and Sarah Leutner, University of Potsdam, Germany} 
  

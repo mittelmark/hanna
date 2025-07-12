@@ -101,14 +101,12 @@ simul$pairings <- function (x) {
 #'     This function allows you to create matches for all against all in a season and performs the matches
 #'     based on the given model and the current number of tokens for each team.
 #' }
-#' \value{list with three components: 
-#'   \itemize{
-#'      \item{M}{matrix of results where 1 is a win, -1 is a loss and 0 is a draw}
-#'      \item{token}{vector of current tokens for each team}
-#'      \item{model}{the choosen model}
-#'      \item{memory}{list with last results for each agent}
-#'      \item{game.prob}{matrix of probabilities for performing a game between two items}
-#'   }
+#' \value{list with five components: 
+#'    \item{M}{matrix of results where 1 is a win, -1 is a loss and 0 is a draw}
+#'    \item{token}{vector of current tokens for each team}
+#'    \item{model}{the choosen model}
+#'    \item{memory}{list with last results for each agent}
+#'    \item{game.prob}{matrix of probabilities for performing a game between two items}
 #' }
 #' \examples{
 #' set.seed(123)
@@ -510,7 +508,6 @@ simul$getNames <- function (n) {
     }
 }
 
-#' \name{simul$gini} %{{{
 #' \alias{simul_gini}
 #' \alias{simul$gini}
 #' \title{ Gini coefficient }
@@ -529,7 +526,6 @@ simul$getNames <- function (n) {
 #' simul$gini(c(1,2,3,4,10))
 #' simul$gini(c(1,1,1,1,1))
 #' }
-#' 
 
 ### https://github.com/oliviaguest/gini/blob/master/gini.py
 simul$gini <- function (x, method = c("ranked-gini", "lorenz" )) { 
