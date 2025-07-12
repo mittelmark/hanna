@@ -4,14 +4,22 @@ R code for the paper - Hermanussen, M., Dammhahn, M., Scheffler C. & Groth. D.
 Winner-loser effects improve social network efficiency between competitors with equal resource holding power.
 Sci Rep 13, 14439 (2023). [https://doi.org/10.1038/s41598-023-41225-y](https://doi.org/10.1038/s41598-023-41225-y) - or in nature.com [https://www.nature.com/articles/s41598-023-41225-y](https://www.nature.com/articles/s41598-023-41225-y)
 
-Installation (version 0.2.1, version forthe paper figures):
+Installation (version 0.2.1, version for the paper figures):
 
 ```r
 > install.packages("https://github.com/mittelmark/hanna/releases/download/0.2.1/hanna_0.2.1.tar.gz")
     repos=NULL)
 ```
 
-Alternatively  you can install the latest  version  directly from Github using
+Alternatively  you can install version 0.3.0 which contains as well other Gini
+measures:
+
+```r
+> install.packages("https://github.com/mittelmark/hanna/releases/download/0.3.0/hanna_0.3.0.tar.gz")
+    repos=NULL)
+```
+
+Alternatively  you can install the latest development version  directly from Github using
 the remotes library:
 
 ```r
