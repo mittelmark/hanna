@@ -9,7 +9,8 @@
 \usage{ `simul$gini(x)` } 
  
 \arguments{ 
-  \item{x}{ vector with numerical vectorss } 
+  \item{x}{ vector with numerical values } 
+  \item{method}{either "ranked-gini" or "lorenz", default = "ranked-gini"} 
 } 
 \value{computed Gini coefficient } 
 \examples{ 

@@ -521,7 +521,8 @@ simul$getNames <- function (n) {
 #' \usage{ `simul$gini(x)` }
 #'
 #' \arguments{
-#'   \item{x}{ vector with numerical vectorss }
+#'   \item{x}{ vector with numerical values }
+#'   \item{method}{either "ranked-gini" or "lorenz", default = "ranked-gini"}
 #' }
 #' \value{computed Gini coefficient }
 #' \examples{
@@ -531,13 +532,36 @@ simul$getNames <- function (n) {
 #' 
 
 ### https://github.com/oliviaguest/gini/blob/master/gini.py
-simul$gini <- function (x) { 
-    x = x-min(x)+0.00001; 
-    x=sort(x); 
-    n=length(x); 
-    index=1:n; 
-    return((sum((2*index-n-1)*x)) / (n*sum(x))) 
-}
+simul$gini <- function (x, method = c("ranked-gini", "lorenz" )) { 
+    method <- match.arg(method)
+
+    # extreme case: everyone has nothing
+    if (all(x==0))
+        return(0)
+
+    # Glasser Brown; Rank based #
+    if(method == "ranked-gini"){
+        x = x-min(x)+0.00001; 
+        x=sort(x); 
+        n=length(x); 
+        index=1:n; 
+        return((sum((2*index-n-1)*x)) / (n*sum(x)))  
+    }
+
+    # Lorenz; Total Share #
+        x <- sort(x)
+        n <- length(x)
+        if (sum(x) == 0) return(0)
+
+        B <- sum((1:n) * x)
+        G <- 2 * B / (n * sum(x)) - (n + 1) / n
+
+        ## optional perfect‑inequality patch, particularly relevant in smaller popu
+        if (max(x) > 0 && sum(x == 0) == n - 1) G <- 1
+
+        return(G)
+    }
+
 
 #' \name{simul$gridAgents}
 #' \alias{simul_gridAgents}
