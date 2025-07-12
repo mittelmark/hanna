@@ -1,0 +1,39 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+#
+# See https://github.com/r-lib/actions/tree/master/examples#readme for
+# additional example workflows available for the R community.
+
+name: Package build on Ubuntu
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - uses: actions/checkout@v4
+      - name: Process and Create Package Structure
+        run: |
+            sudo apt install r-cran-knitr
+      - name: build package
+        run: |
+            export VRS=`grep Version: hanna/DESCRIPTION | grep -oE '[.0-9]+'`
+            echo "VRS=$VRS" >> $GITHUB_ENV
+            make build 
+            make check
+      - name: Upload Package Release files
+        uses: actions/upload-artifact@v4
+        with: 
+          name: hanna_${{ env.VRS }}.tar.gz
+          path: hanna_${{ env.VRS }}.tar.gz
