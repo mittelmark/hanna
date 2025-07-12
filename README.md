@@ -7,32 +7,32 @@ Sci Rep 13, 14439 (2023). [https://doi.org/10.1038/s41598-023-41225-y](https://d
 Installation (version 0.2.1, version for the paper figures):
 
 ```r
-> install.packages("https://github.com/mittelmark/hanna/releases/download/0.2.1/hanna_0.2.1.tar.gz")
-    repos=NULL)
+install.packages("https://github.com/mittelmark/hanna/releases/download/0.2.1/hanna_0.2.1.tar.gz"),
+  repos=NULL)
 ```
 
 Alternatively  you can install version 0.3.0 which contains as well other Gini
 measures:
 
 ```r
-> install.packages("https://github.com/mittelmark/hanna/releases/download/0.3.0/hanna_0.3.0.tar.gz")
-    repos=NULL)
+install.packages("https://github.com/mittelmark/hanna/releases/download/v0.3.0/hanna_0.3.0.tar.gz",
+   repos=NULL)
 ```
 
 Alternatively  you can install the latest development version  directly from Github using
 the remotes library:
 
 ```r
-> install.libarary(remotes)
-> library(remotes)
-> remotes::install_github("https://github.com/mittelmark/hanna")
+install.libarary(remotes)
+library(remotes)
+remotes::install_github("https://github.com/mittelmark/hanna")
 ```
 
 Thereafter you can check the installation like this:
 
 ```r
-> library(hanna)
-> citation("hanna")
+library(hanna)
+citation("hanna")
 ```
 
 Which should display something like this:
