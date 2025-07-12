@@ -36,6 +36,7 @@ jobs:
           r-version: ${{ matrix.r-version }}
       - name: Install dependencies
         run: |
+          eval "$(/usr/libexec/path_helper)"
           install.packages(c("remotes", "rcmdcheck","tcltk"))
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
@@ -44,6 +45,7 @@ jobs:
         shell: Rscript {0}
       - name: build package
         run: |
+            eval "$(/usr/libexec/path_helper)"
             export VRS=`grep Version: DESCRIPTION | grep -oE '[.0-9]+'`
             echo "VRS=$VRS" >> $GITHUB_ENV
             make build check
